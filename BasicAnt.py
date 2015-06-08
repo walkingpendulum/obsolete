@@ -57,7 +57,6 @@ class BasicAnt(Ant):
             else:
                 return self.coord + ('move',)
         elif self.has_food is True:
-            u = BasicAnt.planet.get_neighborhood
             data = BasicAnt.planet.get_data_from_cell
             if self.base_coord[0] == 0:
                 steps = ['down', 'left']
