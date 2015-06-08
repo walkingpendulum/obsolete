@@ -28,7 +28,7 @@ class BasicAnt(Ant):
             x_new, y_new = x + add[str_with_step][0], y + add[str_with_step][1]
             x_max, y_max = BasicAnt.planet.size[0], BasicAnt.planet.size[1]
 
-            if not (0 <= x_new < x_max and 0 <= y_new < y_max:
+            if not (0 <= x_new < x_max and 0 <= y_new < y_max):
                 # cannot go out of game field -- passed turn
                 return x, y
 

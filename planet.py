@@ -34,7 +34,7 @@ class Base(object):
             x, y = choice([(x0 + dx, y0 + dy) for dx in range(-1, 2) for dy in range(-1, 2)
                            if 0 <= x0 + dx < x_max and 0 <= y0 + dy < y_max
                            and not isinstance(cell(x0 + dx, y0 + dy), (Base, Ant))])
-            ant = self.AntClass(coord=(x, y), team=self.team)
+            ant = self.AntClass(coord=(x, y), base=self)
             self.catalog.update({ant})
             self.planet.land(x, y).set(ant)
         except IndexError:
@@ -131,7 +131,7 @@ class Planet(object):
             label = ' ' if figure == None \
                 else Food.label if isinstance(figure, Food) \
                 else Base.label if isinstance(figure, Base) \
-                else str(figure.team)
+                else str(figure.base.team)
             Buffer.append(label)
 
             ind += 1
