@@ -13,7 +13,7 @@ class Ant(object):
 
 class BasicAnt(Ant):
     planet = None
-    max_food_time = 5
+    max_food_time = 50
 
     def __init__(self, coord, base):
         self.base = base
@@ -44,7 +44,7 @@ class BasicAnt(Ant):
 
             if isinstance(cell(x_new, y_new), Food):
                 ant.has_food = True
-                ant.food_share_time = BasicAnt.max_food_time
+                ant.food_time = BasicAnt.max_food_time
                 return (x_new, y_new) + ('take_food',)
             elif cell(x_new, y_new) is None:
                 return (x_new, y_new) + ('move',)
