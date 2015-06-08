@@ -1,9 +1,9 @@
 '''
-class Planet():
-    get_neighborhood(x, y) -> ((x_i, y_i, type) for x, y if dist((x,y), (x_i, y_i)) <= r)
-    types: Food, NoneType, Base, %AntClass%
+    ant.move() -> (x_new, y_new, move)
+    moves: 'hit', 'move', 'take_food', 'drop_food'
 
 '''
+
 
 from random import choice
 from planet import Food, Base
@@ -12,63 +12,64 @@ class Ant(object):
     pass
 
 class BasicAnt(Ant):
-    X_SIZE, Y_SIZE = 10, 10
     planet = None
+    max_food_time = 5
 
-    def __init__(self, coord, team):
-        self.team = team
+    def __init__(self, coord, base):
+        self.base = base
         self.coord = coord
         self.has_food = False
         self.food_time = 0
-        self.stack = []
-        self.base_coord = (0, 0) if 0 <= self.coord[0] < 2 \
-                          else (BasicAnt.X_SIZE - 1, BasicAnt.Y_SIZE - 1)
 
     def move(self):
-        '''
-            move() -> (x_new, y_new, move)
-            moves: 'hit', 'move', 'take_food', 'drop_food'
-
-        '''
-        def next_coordinates(x, y, step=None):
-            ''' steps: 'up', 'down', 'left', 'right' '''
+        def compute_next_coord_by_str_with_step(x, y, str_with_step=None):
             add = {'up': (0, 1), 'down': (0, -1), 'left': (-1, 0), 'right': (1, 0)}
-            x_new, y_new = x + add[step][0], y + add[step][1]
+            cell = BasicAnt.planet.get_data_from_cell
+            x_new, y_new = x + add[str_with_step][0], y + add[str_with_step][1]
+            x_max, y_max = BasicAnt.planet.size[0], BasicAnt.planet.size[1]
 
-            if not (0 <= x_new < BasicAnt.X_SIZE and 0 <= y_new < BasicAnt.Y_SIZE):
+            if not (0 <= x_new < x_max and 0 <= y_new < y_max:
+                # cannot go out of game field -- passed turn
                 return x, y
-            data = BasicAnt.planet.get_data_from_cell(x_new, y_new)
-            if not isinstance(data, Ant):                  
-                    return (x_new, y_new)
+
+            if not isinstance(cell(x_new, y_new), Ant):                 
+                return (x_new, y_new)
             else:
                 return (x, y)
-
-
-        if self.has_food is False:
+                    
+        def compute_next_move_for_ant_wo_food(ant):
             next_step = choice(['up', 'down', 'left', 'right'])
-            x, y = next_coordinates(*self.coord, step=next_step)
-            data = BasicAnt.planet.get_data_from_cell(x, y)
-            if isinstance(data, Food):
-                self.has_food = True
-                self.food_share_time = 20
-                return (x, y) + ('take_food',)
-            elif data is None:
-                return (x, y) + ('move',)
+            x_new, y_new = compute_next_coord_by_str_with_step(*ant.coord, str_with_step=next_step)
+            cell = BasicAnt.planet.get_data_from_cell
+
+            if isinstance(cell(x_new, y_new), Food):
+                ant.has_food = True
+                ant.food_share_time = BasicAnt.max_food_time
+                return (x_new, y_new) + ('take_food',)
+            elif cell(x_new, y_new) is None:
+                return (x_new, y_new) + ('move',)
             else:
+                # there are not food nor nothing in cell -- passed turn
                 return self.coord + ('move',)
-        elif self.has_food is True:
-            data = BasicAnt.planet.get_data_from_cell
-            if self.base_coord[0] == 0:
-                steps = ['down', 'left']
-            else:
-                steps = ['up', 'right']
-            x, y = next_coordinates(*self.coord, step=choice(steps))
-            if (x, y) == self.base_coord:
-                self.has_food = False
-                self.food_time = 0
-                return (x, y) + ('drop_food',)
-            else:
-                if self.food_share_time == 1:
-                    self.has_food = False
-                self.food_time -= 1
-                return (x, y) + ('move',)
+                    
+        def compute_next_move_for_ant_w_food(ant):
+            strings = ['down', 'left'] if ant.base.coord[0] == 0 else ['up', 'right']
+            x_new, y_new = compute_next_coord_by_str_with_step(*ant.coord, str_with_step=choice(strings))
+
+            if (x_new, y_new) == ant.base.coord: # reached our base
+                ant.has_food = False
+                ant.food_time = 0
+                return (x_new, y_new) + ('drop_food',)
+
+            # still on our way and food is fresh enough
+            if ant.food_time > 1:
+                ant.food_time -= 1
+                return (x_new, y_new, 'move')
+            else: 
+                ant.has_food = False
+                ant.food_time = 0
+                move = 'move' if (x_new, y_new) == ant.coord else 'drop_food'
+                return (x_new, y_new, move)
+
+        return compute_next_move_for_ant_w_food(self) if self.has_food \
+                    else compute_next_move_for_ant_wo_food(self)
