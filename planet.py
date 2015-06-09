@@ -3,7 +3,8 @@ from random import uniform, randint, choice
 
 
 class Ant(object):
-    pass
+    def __init__(self):
+        self.dead = False
 
 class Base(object):
     label = 'B'
@@ -73,35 +74,52 @@ class Planet(object):
         return self._land[y][x]
 
     def advance(self):
+        def hit_move(base, enemy_base, x, y, ant):
+            if not hasattr(base, 'killed_ants_set'):
+                base.killed_ants_set = set()
+            if 0 <= uniform(0, 1) <= self.hit_prob:
+                enemy = self.land(x, y).data()
+                enemy.dead = True
+                dead_ants.update({enemy})
+
+        def move_move(base, enemy_base, x, y, ant):
+            self.land(*ant.coord).set(None)
+            ant.coord = (x, y)
+            self.land(*ant.coord).set(ant)
+
+        def drop_food_move(base, enemy_base, x, y, ant):
+            if (x, y) == base.coord:
+                base.food += 1
+            elif isinstance(base.locate(x, y), Food):
+                base.locate(x, y).quantity += 1
+            else:
+                self.land(x, y).set(Food(1))
+
+        def take_food_move(base, enemy_base, x, y, ant):
+            if base.locate(x, y).quantity == 1:
+                ant.has_food = True
+                self.land(x, y).set(None)
+            elif base.locate(x, y).quantity > 1:
+                ant.has_food = True
+                base.locate(x, y).quantity -= 1
+
         def update_base(base, enemy_base):
+            move_functions = {'hit': hit_move, \
+                     'move': move_move, \
+                     'drop_food': drop_food_move, \
+                     'take_food': take_food_move}
+
             base.advance()
-            dead_ants_set = set()
             for ant in base.catalog:
                 x, y, move = ant.move()
                 if self.move_checker(ant.coord, x, y, move, base, enemy_base) is True:
-                    if move == 'hit':
-                        if 0 <= uniform(0, 1) <= self.hit_prob:
-                            dead_ants.update({self.land(x, y).data()})
-                    elif move == 'move':
-                        self.land(*ant.coord).set(None)
-                        ant.coord = (x, y)
-                        self.land(*ant.coord).set(ant)
-                    elif move == 'drop_food':
-                        if (x, y) == base.coord:
-                            base.food += 1
-                        else:
-                            self.land(x, y).set(Food(1))
-                    elif move == 'take_food':
-                        if self.land(x, y)._data.quantity == 1:
-                            ant.has_food = True
-                            self.land(x, y).set(None)
-                        elif self.land(x, y)._data.quantity > 1:
-                            ant.has_food = True
-                            self.land(x, y)._data.quantity -= 1
+                    move_functions[move](base, enemy_base, x, y, ant)
                 else:
                     print 'Uncorrect move detected, ant skipped'
                     continue
-            enemy_base.catalog.difference_update(dead_ants_set)
+            if hasattr(base, 'killed_ants_set'):
+                enemy_base.catalog.difference_update(base.killed_ants_set)
+                delattr(base, 'killed_ants_set')
 
         update_base(self.Base1, self.Base2)
         update_base(self.Base2, self.Base1)                    

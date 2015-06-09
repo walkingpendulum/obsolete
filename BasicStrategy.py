@@ -9,7 +9,7 @@ from Planet import Food, Base, Ant
 
 class BasicBase(Base):
     label = 'B'
-    max_ant_quantity = 3
+    max_ant_quantity = 20
 
     def __init__(self, AntClass, coord, planet, team):
         self.AntClass = AntClass
@@ -38,9 +38,10 @@ class BasicBase(Base):
             self.spawn()
 
 class BasicAnt(Ant):
-    max_food_time = 50
+    max_food_time = 10
 
     def __init__(self, coord, base):
+        Ant.__init__(self)
         self.base = base
         self.coord = coord
         self.has_food = False

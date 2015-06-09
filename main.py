@@ -14,6 +14,6 @@ Earth = Planet(size=(X_SIZE, Y_SIZE),
 for i in range(1000):
     Earth.advance()
     print Earth
-    sleep(0.3)
+    sleep(0.2)
 
 print Earth
