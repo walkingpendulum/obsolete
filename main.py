@@ -10,8 +10,6 @@ Earth = Planet(size=(X_SIZE, Y_SIZE),
                BaseClass1=BasicBase,
                AntClass2=BasicAnt,
                BaseClass2=BasicBase)
-BasicAnt.planet = Earth
-
 
 for i in range(1000):
     Earth.advance()

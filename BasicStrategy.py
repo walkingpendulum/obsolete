@@ -34,7 +34,6 @@ class BasicBase(Base):
             pass
 
 class BasicAnt(Ant):
-    planet = None
     max_food_time = 50
 
     def __init__(self, coord, base):
@@ -46,9 +45,9 @@ class BasicAnt(Ant):
     def move(self):
         def compute_next_coord_by_str_with_step(x, y, str_with_step=None):
             add = {'up': (0, 1), 'down': (0, -1), 'left': (-1, 0), 'right': (1, 0)}
-            cell = BasicAnt.planet.get_data_from_cell
+            cell = self.base.planet.get_data_from_cell
             x_new, y_new = x + add[str_with_step][0], y + add[str_with_step][1]
-            x_max, y_max = BasicAnt.planet.size[0], BasicAnt.planet.size[1]
+            x_max, y_max = self.base.planet.size[0], self.base.planet.size[1]
 
             if not (0 <= x_new < x_max and 0 <= y_new < y_max):
                 # cannot go out of game field -- passed turn
@@ -62,7 +61,7 @@ class BasicAnt(Ant):
         def compute_next_move_for_ant_wo_food(ant):
             next_step = choice(['up', 'down', 'left', 'right'])
             x_new, y_new = compute_next_coord_by_str_with_step(*ant.coord, str_with_step=next_step)
-            cell = BasicAnt.planet.get_data_from_cell
+            cell = self.base.planet.get_data_from_cell
 
             if isinstance(cell(x_new, y_new), Food):
                 ant.has_food = True
