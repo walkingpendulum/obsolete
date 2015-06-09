@@ -16,6 +16,9 @@ class Base(object):
     def spawn(self):
         pass
 
+    def locate(self, x, y):
+        return self.planet.land(x, y)._data
+
 class Food(object):
     prob = 0.05
     label = 'f'
@@ -65,9 +68,6 @@ class Planet(object):
 
     def land(self, x, y):
         return self._land[y][x]
-
-    def get_data_from_cell(self, x, y):
-        return self.land(x, y)._data
 
     def advance(self):
         def update_base(base, enemy_base):
