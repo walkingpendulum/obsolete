@@ -1,45 +1,26 @@
 from itertools import chain
-from random import uniform
-from random import randint
-from random import choice
+from random import uniform, randint, choice
 
 
 class Ant(object):
     pass
+
+class Base(object):
+    label = 'B'
+    def __init__(self, AntClass, coord, planet, team):
+        self.AntClass = AntlCass
+        self.coord = coord
+        self.planet = planet
+        self.team = team
+
+    def spawn(self):
+        pass
 
 class Food(object):
     prob = 0.05
     label = 'f'
     def __init__(self, quantity):
         self.quantity = quantity
-
-
-class Base(object):
-    label = 'B'
-    max_ant_quantity = 3
-
-    def __init__(self, AntClass, coord, planet, team):
-        self.AntClass = AntClass
-        self.planet = planet
-        self.coord = coord
-        self.team = team
-        self.food = 0
-        self.catalog = set()
-
-    def spawn(self):
-        cell = self.planet.get_data_from_cell
-        x0, y0 = self.coord
-        x_max, y_max = self.planet.size
-        try:
-            x, y = choice([(x0 + dx, y0 + dy) for dx in range(-1, 2) for dy in range(-1, 2)
-                           if 0 <= x0 + dx < x_max and 0 <= y0 + dy < y_max
-                           and not isinstance(cell(x0 + dx, y0 + dy), (Base, Ant))])
-            ant = self.AntClass(coord=(x, y), base=self)
-            self.catalog.update({ant})
-            self.planet.land(x, y).set(ant)
-        except IndexError:
-            pass
-
 
 class Cell(object):
     def __init__(self, x, y, planet):
@@ -56,13 +37,13 @@ class Cell(object):
 
 class Planet(object):
     hit_prob = 0.5
-    def __init__(self, size, AntClass1, AntClass2):
+    def __init__(self, size, AntClass1, AntClass2, BaseClass1, BaseClass2):
         self.size = size
-        self.Base1 = Base(AntClass=AntClass1,
+        self.Base1 = BaseClass1(AntClass=AntClass1,
                           coord=(0, 0),
                           planet=self,
                           team=1)
-        self.Base2 = Base(AntClass=AntClass1,
+        self.Base2 = BaseClass2(AntClass=AntClass1,
                           coord=(self.size[0] - 1, self.size[1] - 1),
                           planet=self,
                           team=2)

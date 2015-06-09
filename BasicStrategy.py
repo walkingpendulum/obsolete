@@ -3,13 +3,35 @@
     moves: 'hit', 'move', 'take_food', 'drop_food'
 
 '''
-
-
 from random import choice
-from planet import Food, Base
+from Planet import Food, Base, Ant
 
-class Ant(object):
-    pass
+
+class BasicBase(Base):
+    label = 'B'
+    max_ant_quantity = 3
+
+    def __init__(self, AntClass, coord, planet, team):
+        self.AntClass = AntClass
+        self.planet = planet
+        self.coord = coord
+        self.team = team
+        self.food = 0
+        self.catalog = set()
+
+    def spawn(self):
+        cell = self.planet.get_data_from_cell
+        x0, y0 = self.coord
+        x_max, y_max = self.planet.size
+        try:
+            x, y = choice([(x0 + dx, y0 + dy) for dx in range(-1, 2) for dy in range(-1, 2)
+                           if 0 <= x0 + dx < x_max and 0 <= y0 + dy < y_max
+                           and not isinstance(cell(x0 + dx, y0 + dy), (Base, Ant))])
+            ant = self.AntClass(coord=(x, y), base=self)
+            self.catalog.update({ant})
+            self.planet.land(x, y).set(ant)
+        except IndexError:
+            pass
 
 class BasicAnt(Ant):
     planet = None
