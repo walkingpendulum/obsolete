@@ -8,7 +8,7 @@ class Ant(object):
 class Base(object):
     label = 'B'
     def __init__(self, AntClass, coord, planet, team):
-        self.AntClass = AntlCass
+        self.AntClass = AntClass
         self.coord = coord
         self.planet = planet
         self.team = team
@@ -18,6 +18,9 @@ class Base(object):
 
     def locate(self, x, y):
         return self.planet.land(x, y)._data
+
+    def advance(self):
+        pass
 
 class Food(object):
     prob = 0.05
@@ -71,6 +74,7 @@ class Planet(object):
 
     def advance(self):
         def update_base(base, enemy_base):
+            base.advance()
             dead_ants_set = set()
             for ant in base.catalog:
                 x, y, move = ant.move()
@@ -97,8 +101,6 @@ class Planet(object):
                 else:
                     print 'Uncorrect move detected, ant skipped'
                     continue
-            if len(base.catalog) < base.max_ant_quantity:
-                base.spawn()
             enemy_base.catalog.difference_update(dead_ants_set)
 
         update_base(self.Base1, self.Base2)

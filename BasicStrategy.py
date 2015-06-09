@@ -33,6 +33,10 @@ class BasicBase(Base):
         except IndexError:
             pass
 
+    def advance(self):
+        if len(self.catalog) < self.max_ant_quantity:
+            self.spawn()
+
 class BasicAnt(Ant):
     max_food_time = 50
 
