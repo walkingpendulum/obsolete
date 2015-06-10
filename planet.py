@@ -160,6 +160,7 @@ class Planet(object):
         cell = lambda x, y: self.land(x, y)._data
         if not (x - 2 < old_coord[0] < x + 2 and y - 2 < old_coord[1] < y + 2):
             print "Ant cannot fly but for jump that was too long distance", x, y
+            return False
         if move == 'take_food' and not isinstance(cell(x, y), Food):
             print 'take food from empty place', x, y
             return False
