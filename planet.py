@@ -103,13 +103,13 @@ class Planet(object):
             else:
                 self.land(x, y).set(Food(1))
 
+
         def take_food_move(base, enemy_base, x, y, ant):
             if base.locate(x, y).quantity == 1:
-                ant.has_food = True
                 self.land(x, y).set(None)
             elif base.locate(x, y).quantity > 1:
-                ant.has_food = True
                 base.locate(x, y).quantity -= 1
+
 
         def update_base(base, enemy_base):
             move_functions = {'hit': hit_move, \
@@ -158,6 +158,8 @@ class Planet(object):
 
     def move_checker(self, old_coord, x, y, move, base, enemy_base):
         cell = lambda x, y: self.land(x, y)._data
+        if not (x - 2 < old_coord[0] < x + 2 and y - 2 < old_coord[1] < y + 2):
+            print "Ant cannot fly but for jump that was too long distance", x, y
         if move == 'take_food' and not isinstance(cell(x, y), Food):
             print 'take food from empty place', x, y
             return False

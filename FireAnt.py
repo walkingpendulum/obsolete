@@ -29,19 +29,12 @@ class FireAntBase(Base):
                            and type(self.planet).cost_of_ant <= self.food:
             self.spawn()
 
-class FireAnt(Ant):
-    max_food_time = 10
-
-    def __init__(self, coord, base):
-        Ant.__init__(self, coord, base)
-        self.food_time = 0
-
-    def move(self):
+    def accept_delegation(self, ant):
         def compute_next_coord_by_str_with_step(x, y, str_with_step=None):
             add = {'up': (0, 1), 'down': (0, -1), 'left': (-1, 0), 'right': (1, 0)}
-            cell = self.base.locate
+            cell = ant.base.locate
             x_new, y_new = x + add[str_with_step][0], y + add[str_with_step][1]
-            x_max, y_max = self.base.planet.size[0], self.base.planet.size[1]
+            x_max, y_max = ant.base.planet.size[0], ant.base.planet.size[1]
 
             if not (0 <= x_new < x_max and 0 <= y_new < y_max):
                 # cannot go out of game field -- passed turn
@@ -55,11 +48,11 @@ class FireAnt(Ant):
         def compute_next_move_for_ant_wo_food(ant):
             next_step = choice(['up', 'down', 'left', 'right'])
             x_new, y_new = compute_next_coord_by_str_with_step(*ant.coord, str_with_step=next_step)
-            cell = self.base.locate
+            cell = ant.base.locate
 
             if isinstance(cell(x_new, y_new), Food):
                 ant.has_food = True
-                ant.food_time = type(self).max_food_time
+                ant.food_time = type(ant).max_food_time
                 return (x_new, y_new) + ('take_food',)
             elif cell(x_new, y_new) is None:
                 return (x_new, y_new) + ('move',)
@@ -86,5 +79,19 @@ class FireAnt(Ant):
                 move = 'move' if (x_new, y_new) == ant.coord else 'drop_food'
                 return (x_new, y_new, move)
 
-        return compute_next_move_for_ant_w_food(self) if self.has_food \
-                    else compute_next_move_for_ant_wo_food(self)
+        return compute_next_move_for_ant_w_food(ant) if ant.has_food \
+                    else compute_next_move_for_ant_wo_food(ant)
+
+    
+class FireAnt(Ant):
+    max_food_time = 10
+
+    def __init__(self, coord, base):
+        Ant.__init__(self, coord, base)
+        self.food_time = 0
+
+    def delegate(self):
+        return self.base.accept_delegation(self)
+
+    def move(self):
+        return self.delegate()
