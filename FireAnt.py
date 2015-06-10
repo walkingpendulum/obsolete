@@ -73,7 +73,7 @@ class FireAntBase(Base):
             if ant.food_time > 1:
                 ant.food_time -= 1
                 return (x_new, y_new, 'move')
-            else:
+            else: 
                 ant.has_food = False
                 ant.food_time = 0
                 move = 'move' if (x_new, y_new) == ant.coord else 'drop_food'

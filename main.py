@@ -18,7 +18,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     log_name = datetime.now().strftime("%y-%m-%d-%H-%M-%S")
 
-    FirstAntClass, FirstBaseClass = FireAnt, FireAntBase
+    FirstAntClass, FirstBaseClass = BasicAnt, BasicBase
     SecondAntClass, SecondBaseClass = BasicAnt, BasicBase
     Earth = Planet(size=map(int, args.size.split()),
                    AntClass1=FirstAntClass, BaseClass1=FirstBaseClass,
