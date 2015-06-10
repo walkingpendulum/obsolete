@@ -8,12 +8,12 @@ from Planet import Food, Base, Ant
 
 
 class BasicBase(Base):
-    max_ant_quantity = 20
+    max_ant_quantity = 7
 
     def __init__(self, AntClass, coord, planet, team):
         Base.__init__(self, AntClass, coord, planet, team)
         # smth else you want to
-        type(self).max_ant_quantity = max(planet.size)
+#        type(self).max_ant_quantity = max(planet.size)
 
     def spawn(self):
         cell = self.locate
