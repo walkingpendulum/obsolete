@@ -8,16 +8,12 @@ from Planet import Food, Base, Ant
 
 
 class BasicBase(Base):
-    label = 'B'
     max_ant_quantity = 20
 
     def __init__(self, AntClass, coord, planet, team):
-        self.AntClass = AntClass
-        self.planet = planet
-        self.coord = coord
-        self.team = team
-        self.food = 0
-        self.catalog = set()
+        Base.__init__(self, AntClass, coord, planet, team)
+        # smth else you want to
+        type(self).max_ant_quantity = max(planet.size)
 
     def spawn(self):
         cell = self.locate
@@ -34,17 +30,15 @@ class BasicBase(Base):
             pass
 
     def advance(self):
-        if len(self.catalog) < self.max_ant_quantity:
+        if len(self.catalog) < type(self).max_ant_quantity \
+                           and type(self.planet).cost_of_ant <= self.food:
             self.spawn()
 
 class BasicAnt(Ant):
     max_food_time = 10
 
     def __init__(self, coord, base):
-        Ant.__init__(self)
-        self.base = base
-        self.coord = coord
-        self.has_food = False
+        Ant.__init__(self, coord, base)
         self.food_time = 0
 
     def move(self):

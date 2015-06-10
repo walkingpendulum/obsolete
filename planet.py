@@ -3,16 +3,24 @@ from random import uniform, randint, choice
 
 
 class Ant(object):
-    def __init__(self):
-        self.dead = False
+    def __init__(self, coord, base):
+        self.base = base
+        self.coord = coord
+        self.has_food = False
+
+    def move(self):
+        return self.coord + ('move', )
 
 class Base(object):
     label = 'B'
+
     def __init__(self, AntClass, coord, planet, team):
         self.AntClass = AntClass
         self.coord = coord
         self.planet = planet
         self.team = team
+        self.food = 3 * Planet.cost_of_ant
+        self.catalog = set()
 
     def spawn(self):
         pass
@@ -24,7 +32,7 @@ class Base(object):
         pass
 
 class Food(object):
-    prob = 0.05
+    prob = 0.3
     label = 'f'
     def __init__(self, quantity):
         self.quantity = quantity
@@ -44,13 +52,14 @@ class Cell(object):
 
 class Planet(object):
     hit_prob = 0.5
+    cost_of_ant = 5
     def __init__(self, size, AntClass1, AntClass2, BaseClass1, BaseClass2):
         self.size = size
         self.Base1 = BaseClass1(AntClass=AntClass1,
                           coord=(0, 0),
                           planet=self,
                           team=1)
-        self.Base2 = BaseClass2(AntClass=AntClass1,
+        self.Base2 = BaseClass2(AntClass=AntClass2,
                           coord=(self.size[0] - 1, self.size[1] - 1),
                           planet=self,
                           team=2)
@@ -65,7 +74,7 @@ class Planet(object):
                 elif (x, y) == self.Base2.coord:
                     cell.set(self.Base2)
                 elif 0 <= uniform(0,1) < Food.prob:
-                    cell.set(Food(randint(1, 2)))
+                    cell.set(Food(randint(1, 5)))
                 self._land[y].append(cell)
             self._land[y] = tuple(self._land[y])
         self._land = tuple(self._land)
@@ -75,12 +84,9 @@ class Planet(object):
 
     def advance(self):
         def hit_move(base, enemy_base, x, y, ant):
-            if not hasattr(base, 'killed_ants_set'):
-                base.killed_ants_set = set()
             if 0 <= uniform(0, 1) <= self.hit_prob:
                 enemy = self.land(x, y).data()
-                enemy.dead = True
-                dead_ants.update({enemy})
+                enemy_base.catalog.difference_update({enemy})
 
         def move_move(base, enemy_base, x, y, ant):
             self.land(*ant.coord).set(None)
@@ -90,6 +96,8 @@ class Planet(object):
         def drop_food_move(base, enemy_base, x, y, ant):
             if (x, y) == base.coord:
                 base.food += 1
+            elif (x, y) == enemy_base.coord:
+                enemy_base.food += 1
             elif isinstance(base.locate(x, y), Food):
                 base.locate(x, y).quantity += 1
             else:
@@ -109,7 +117,13 @@ class Planet(object):
                      'drop_food': drop_food_move, \
                      'take_food': take_food_move}
 
+            ant_quantity_old = len(base.catalog)
             base.advance()
+            ant_quantity_new = len(base.catalog)
+            ant_quantity_diff = ant_quantity_new - ant_quantity_old
+            if ant_quantity_diff > 0:
+                base.food -= ant_quantity_diff * Planet.cost_of_ant
+
             for ant in base.catalog:
                 x, y, move = ant.move()
                 if self.move_checker(ant.coord, x, y, move, base, enemy_base) is True:
@@ -117,9 +131,6 @@ class Planet(object):
                 else:
                     print 'Uncorrect move detected, ant skipped'
                     continue
-            if hasattr(base, 'killed_ants_set'):
-                enemy_base.catalog.difference_update(base.killed_ants_set)
-                delattr(base, 'killed_ants_set')
 
         update_base(self.Base1, self.Base2)
         update_base(self.Base2, self.Base1)                    
