@@ -1,5 +1,5 @@
 from itertools import chain
-from random import uniform, randint, choice
+from random import uniform, randint
 
 
 class Ant(object):
@@ -158,8 +158,12 @@ class Planet(object):
 
     def move_checker(self, old_coord, x, y, move, base, enemy_base):
         cell = lambda x, y: self.land(x, y)._data
+        if not (0 <= x < self.size[0] and 0 <= y < self.size[1]):
+            print 'your ant goes too far. fare thee well, brave ant', x, y
+            return False
         if not (x - 2 < old_coord[0] < x + 2 and y - 2 < old_coord[1] < y + 2):
             print "Ant cannot fly but for jump that was too long distance", x, y
+            return False
         if move == 'take_food' and not isinstance(cell(x, y), Food):
             print 'take food from empty place', x, y
             return False
@@ -172,9 +176,6 @@ class Planet(object):
         if move == 'move' and ((x, y) == enemy_base.coord \
                                or (x, y) == base.coord):
             print "tried to step down base someone's. too smal for that", x, y
-            return False
-        if not (0 <= x < self.size[0] and 0 <= y < self.size[1]):
-            print 'your ant goes too far. fare thee well, brave ant', x, y
             return False
         if move == 'drop_food' and \
            isinstance(cell(x, y), Ant):
