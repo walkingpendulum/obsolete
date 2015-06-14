@@ -4,7 +4,8 @@ import argparse
 from time import sleep
 from datetime import datetime
 
-from planet import Planet
+from Planet import Planet
+from AntWarsAPI import AntWarsAPI
 from BasicStrategy import BasicAnt, BasicBase
 
 
@@ -26,10 +27,11 @@ if __name__ == '__main__':
     Earth = Planet(size=map(int, args.size.split()),
                    AntClass1=FirstAntClass, BaseClass1=FirstBaseClass,
                    AntClass2=SecondAntClass, BaseClass2=SecondBaseClass)
+    AntWarsAPI.planet = Earth
+
     while True:
         Earth.advance()
         print Earth
-        print len(Earth.Base1.catalog), len(Earth.Base2.catalog)
         if args.logs_flag:
             dump(Earth, log_name)
         sleep(args.delay)

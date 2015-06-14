@@ -6,25 +6,26 @@
 from random import choice
 
 from planet import Food, Base, Ant
+from planet import AntWarsAPI
 
 
 class BasicBase(Base):
     max_ant_quantity = 7
 
-    def __init__(self, AntClass, coord, planet, team):
-        Base.__init__(self, AntClass, coord, planet, team)
+    def __init__(self, team):
+        Base.__init__(self, team)
         # smth else you want to
 
     def advance(self):
         if len(self.catalog) < type(self).max_ant_quantity \
                            and type(self.planet).cost_of_ant <= self.food:
-            self.spawn()
+            self.API.spawn(base=self)
 
 class BasicAnt(Ant):
     max_food_time = 10
 
-    def __init__(self, coord, base):
-        Ant.__init__(self, coord, base)
+    def __init__(self, base):
+        Ant.__init__(self, base)
         self.food_time = 0
 
     def move(self):
