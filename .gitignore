@@ -1,6 +1,8 @@
 
 *.pyc
 
+launch game (win).bat
+
 .idea/.name
 
 .idea/ant_wars.iml
