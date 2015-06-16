@@ -83,7 +83,7 @@ class Planet(object):
             elif isinstance(obj, Ant):
                 if not self.cargo.get(obj, 0):
                     self.cargo[obj] = 1
-            else:
+            elif dst_coord in self.land:
                 self.land[dst_coord] = Food(1)
 
     def take_food(self, dst_coord, ant):
