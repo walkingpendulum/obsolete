@@ -2,3 +2,19 @@
 *.pyc
 
 launch game (win).bat
+
+.idea/.name
+
+.idea/AntWars.iml
+
+.idea/modules.xml
+
+.idea/misc.xml
+
+.idea/scopes/scope_settings.xml
+
+.idea/vcs.xml
+
+.idea/encodings.xml
+
+.idea/workspace.xml
