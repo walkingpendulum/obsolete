@@ -74,7 +74,7 @@ class Planet(object):
 
     def drop_food(self, dst_coord, ant):
         obj = self.land.get(dst_coord, None)
-        if self.cargo[ant]:
+        if self.cargo.get(ant, 0):
             self.cargo[ant] = 0
             if isinstance(obj, Base):
                 self.teams[obj.team_id].food += 1
