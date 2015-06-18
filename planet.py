@@ -26,7 +26,7 @@ class AntWarsTeam(object):
 
 class Planet(object):
     '''Игровой мир: игровое поле, обработка ходов команд, перемещение муравьев'''
-    hit_prob = 0.5      # вероятность убить муравья при ударе
+    hit_prob = 0.8      # вероятность убить муравья при ударе
     cost_of_ant = 5     # стоимость создания одного муравья
     food_prob = 0.3     # вероятность появления еды в клетке при создании планеты
     food_min_start_quantity_in_cell = 3
@@ -36,27 +36,29 @@ class Planet(object):
         self.size = size
         self.coord_by_obj = dict()
         self.obj_by_coord = dict()
-        self.teams_by_id = dict()
+        self.teams_by_base = dict()
         self.cargo_by_ant = dict()   # по муравью дает его загрузку (едой)
 
         for coord in product(*map(range, self.size)):
             self.obj_by_coord[coord] = None
             if 0 <= uniform(0,1) < type(self).food_prob:
                 self.obj_by_coord[coord] = Food(randint(type(self).food_min_start_quantity_in_cell,
-                                                type(self).food_max_start_quantity_in_cell))
+                                                        type(self).food_max_start_quantity_in_cell))
+    def add_team(self, team):
+        team.base = team.BaseClass()
+        self.teams_by_base[team.base] = team
+        team.food = 3 * type(self).cost_of_ant
 
     def Init(self, teams):
         for team in teams:
-            team.base = team.BaseClass(API=AntWarsAPI(planet=self),
-                                       team_id=team.team_id)
-            team.food = 3 * type(self).cost_of_ant
-            self.teams_by_id[team.team_id] = team
+            self.add_team(team)
 
         # рандомим места для баз, размещаем их там и инициализируем
         coord_for_bases = sample(self.obj_by_coord, len(teams))
-        bases = map(lambda team: team.base, self.teams_by_id.itervalues())
-        for base, coord in zip(bases, coord_for_bases):
-            base.API.Init(base)
+        for base, coord in zip(self.teams_by_base, coord_for_bases):
+            API_for_setup = AntWarsAPI(planet=self)
+            API_for_setup.Init(base)
+            base.Init(API=API_for_setup)
             self.obj_by_coord[coord] = base
             self.set_coord(obj=base, coord=coord)
 
@@ -70,7 +72,7 @@ class Planet(object):
         else:
             if 0 <= uniform(0, 1) <= type(self).hit_prob:
                 # удаляем муравья отовсюду
-                self.teams_by_id[enemy.base.team_id].ants_set.difference_update({enemy})
+                self.teams_by_base[enemy.base].ants_set.difference_update({enemy})
                 self.coord_by_obj.pop(enemy)
                 self.cargo_by_ant.pop(enemy, default=None)
 
@@ -79,7 +81,7 @@ class Planet(object):
         if self.cargo_by_ant.get(ant, 0):
             self.cargo_by_ant[ant] = 0
             if isinstance(obj, Base):
-                self.teams_by_id[obj.team_id].food += 1
+                self.teams_by_base[obj].food += 1
             elif isinstance(obj, Food):
                 obj.food += 1
             elif isinstance(obj, Ant):
@@ -116,7 +118,7 @@ class Planet(object):
 
     def advance(self):
         '''Ход планеты, он же игровой день'''
-        for team in self.teams_by_id.itervalues():
+        for team in self.teams_by_base.itervalues():
             team.base.advance()
             for ant in team.ants_set:
                 dst_coord, move = ant.move()
@@ -136,10 +138,10 @@ class Planet(object):
             Buffer.append('\n')
 
         ext_inf = list()
-        for team_ind in self.teams_by_id:
+        for base in self.teams_by_base:
             ext_inf.append('Team %d: food %d, ants %d\n' %
-                           (team_ind,
-                            self.teams_by_id[team_ind].food,
-                            len(self.teams_by_id[team_ind].ants_set)))
+                           (base.team_id,
+                            self.teams_by_base[base].food,
+                            len(self.teams_by_base[base].ants_set)))
         Buffer.extend(ext_inf)
         return "".join(Buffer)

@@ -12,8 +12,11 @@ class AntWarsAPI(object):
 
     def Init(self, base):
         planet = type(self).planet
-        teams_by_base = {planet.teams_by_id[i].base: planet.teams_by_id[i] for i in planet.teams_by_id}
-        self.team = teams_by_base[base]
+        self.team = type(self).planet.teams_by_base[base]
+
+    def get_team_id_by_base(self, base):
+        planet = type(self).planet
+        return planet.teams_by_base[base].team_id
 
     def ask_for_spawn(self, AntClass=type(None)):
         '''Обработка события "создать муравья". Возвращает True, если удалось, False иначе '''
