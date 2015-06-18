@@ -29,94 +29,94 @@ class Planet(object):
     hit_prob = 0.5      # вероятность убить муравья при ударе
     cost_of_ant = 5     # стоимость создания одного муравья
     food_prob = 0.3     # вероятность появления еды в клетке при создании планеты
-    food_min_quantity = 3
-    food_max_quantity = 7
+    food_min_start_quantity_in_cell = 3
+    food_max_start_quantity_in_cell = 7
 
     def __init__(self, size):
         self.size = size
-        self.dict_of_objects_coord = dict()    # по объекту дает его координаты как кортеж
-        self.cargo = dict()   # по муравью дает его загрузку (едой)
-        self.land = dict()
-        self.teams = dict()     # по id команды дает объект AntWarsTeam
+        self.coord_by_obj = dict()
+        self.obj_by_coord = dict()
+        self.teams_by_id = dict()
+        self.cargo_by_ant = dict()   # по муравью дает его загрузку (едой)
 
         for coord in product(*map(range, self.size)):
-            self.land[coord] = None
+            self.obj_by_coord[coord] = None
             if 0 <= uniform(0,1) < type(self).food_prob:
-                food_max, food_min = type(self).food_max_quantity, type(self).food_min_quantity
-                self.land[coord] = Food(randint(food_min, food_max))
+                self.obj_by_coord[coord] = Food(randint(type(self).food_min_start_quantity_in_cell,
+                                                type(self).food_max_start_quantity_in_cell))
 
     def Init(self, teams):
         for team in teams:
             team.base = team.BaseClass(API=AntWarsAPI(planet=self),
                                        team_id=team.team_id)
             team.food = 3 * type(self).cost_of_ant
-            self.teams[team.team_id] = team
+            self.teams_by_id[team.team_id] = team
 
         # рандомим места для баз, размещаем их там и инициализируем
-        coord_for_bases = sample(self.land, len(teams))
-        bases = map(lambda team: team.base, self.teams.itervalues())
+        coord_for_bases = sample(self.obj_by_coord, len(teams))
+        bases = map(lambda team: team.base, self.teams_by_id.itervalues())
         for base, coord in zip(bases, coord_for_bases):
             base.API.Init(base)
-            self.land[coord] = base
+            self.obj_by_coord[coord] = base
             self.set_coord(obj=base, coord=coord)
 
     def set_coord(self, obj, coord):
-        self.dict_of_objects_coord[obj] = coord
+        self.coord_by_obj[obj] = coord
 
     def hit(self, dst_coord, ant):
-        enemy = self.land.get(dst_coord, None)
+        enemy = self.obj_by_coord.get(dst_coord, None)
         if not isinstance(enemy, Ant):
             return
         else:
             if 0 <= uniform(0, 1) <= type(self).hit_prob:
                 # удаляем муравья отовсюду
-                self.teams[enemy.base.team_id].ants_set.difference_update({enemy})
-                self.dict_of_objects_coord.pop(enemy)
-                self.cargo.pop(enemy, default=None)
+                self.teams_by_id[enemy.base.team_id].ants_set.difference_update({enemy})
+                self.coord_by_obj.pop(enemy)
+                self.cargo_by_ant.pop(enemy, default=None)
 
     def drop_food(self, dst_coord, ant):
-        obj = self.land.get(dst_coord, None)
-        if self.cargo.get(ant, 0):
-            self.cargo[ant] = 0
+        obj = self.obj_by_coord.get(dst_coord, None)
+        if self.cargo_by_ant.get(ant, 0):
+            self.cargo_by_ant[ant] = 0
             if isinstance(obj, Base):
-                self.teams[obj.team_id].food += 1
+                self.teams_by_id[obj.team_id].food += 1
             elif isinstance(obj, Food):
                 obj.food += 1
             elif isinstance(obj, Ant):
-                if not self.cargo.get(obj, 0):
-                    self.cargo[obj] = 1
-            elif dst_coord in self.land:
-                self.land[dst_coord] = Food(1)
+                if not self.cargo_by_ant.get(obj, 0):
+                    self.cargo_by_ant[obj] = 1
+            elif dst_coord in self.obj_by_coord:
+                self.obj_by_coord[dst_coord] = Food(1)
 
     def take_food(self, dst_coord, ant):
-        obj = self.land.get(dst_coord, None)
+        obj = self.obj_by_coord.get(dst_coord, None)
         if isinstance(obj, Food):
-            self.cargo[ant] = 1
+            self.cargo_by_ant[ant] = 1
             if obj.food == 1:
-                self.land[dst_coord] = None
+                self.obj_by_coord[dst_coord] = None
             elif obj.food > 1:
                 obj.food -= 1
 
     def move(self, dst_coord, ant):
-        old_coord = self.dict_of_objects_coord[ant]
+        old_coord = self.coord_by_obj[ant]
         # todo: может быть стоит не пропускать ход в planet.move(), если перемещение некорректное, а бросать исключение?
-        if dst_coord not in self.land:
+        if dst_coord not in self.obj_by_coord:
             return
         elif old_coord == dst_coord:
             return
-        elif isinstance(self.land[dst_coord], Ant):
+        elif isinstance(self.obj_by_coord[dst_coord], Ant):
             return
-        elif isinstance(self.land[dst_coord], Base):
+        elif isinstance(self.obj_by_coord[dst_coord], Base):
             return
         else:
-            old_coord = self.dict_of_objects_coord[ant]
-            self.land[old_coord] = None
-            self.land[dst_coord] = ant
+            old_coord = self.coord_by_obj[ant]
+            self.obj_by_coord[old_coord] = None
+            self.obj_by_coord[dst_coord] = ant
             self.set_coord(obj=ant, coord=dst_coord)
 
     def advance(self):
         '''Ход планеты, он же игровой день'''
-        for team in self.teams.itervalues():
+        for team in self.teams_by_id.itervalues():
             team.base.advance()
             for ant in team.ants_set:
                 dst_coord, move = ant.move()
@@ -127,7 +127,7 @@ class Planet(object):
         Buffer = list()
         for y in range(self.size[1]):
             for x in range(self.size[0]):
-                figure = self.land[x, y]
+                figure = self.obj_by_coord[x, y]
                 label = ' ' if figure == None \
                     else Food.label if isinstance(figure, Food) \
                     else Base.label if isinstance(figure, Base) \
@@ -136,10 +136,10 @@ class Planet(object):
             Buffer.append('\n')
 
         ext_inf = list()
-        for team_ind in self.teams:
+        for team_ind in self.teams_by_id:
             ext_inf.append('Team %d: food %d, ants %d\n' %
                            (team_ind,
-                            self.teams[team_ind].food,
-                            len(self.teams[team_ind].ants_set)))
+                            self.teams_by_id[team_ind].food,
+                            len(self.teams_by_id[team_ind].ants_set)))
         Buffer.extend(ext_inf)
         return "".join(Buffer)
