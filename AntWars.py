@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from itertools import product
-from random import uniform, randint, sample
+from random import uniform, randint, sample, choice
 from Ant import Ant
 from Base import Base
-from AntWarsAPI import AntWarsAPI
-
 
 class Food(object):
     '''Обертка для еды'''
@@ -14,7 +12,7 @@ class Food(object):
     def __init__(self, food):
         self.food = food
 
-class AntWarsTeam(object):
+class Team(object):
     '''Обертка вокруг набора данных, относящихся к одной из команд'''
     def __init__(self, AntClass, BaseClass, team_id):
         self.AntClass = AntClass
@@ -24,7 +22,7 @@ class AntWarsTeam(object):
         self.base = None
         self.ants_set = set()
 
-class Planet(object):
+class World(object):
     '''Игровой мир: игровое поле, обработка ходов команд, перемещение муравьев'''
     hit_prob = 0.8      # вероятность убить муравья при ударе
     cost_of_ant = 5     # стоимость создания одного муравья
@@ -56,7 +54,7 @@ class Planet(object):
         # рандомим места для баз, размещаем их там и инициализируем
         coord_for_bases = sample(self.obj_by_coord, len(teams))
         for base, coord in zip(self.teams_by_base, coord_for_bases):
-            API_for_setup = AntWarsAPI(planet=self)
+            API_for_setup = API(planet=self)
             API_for_setup.Init(base)
             base.Init(API=API_for_setup)
             self.obj_by_coord[coord] = base
@@ -145,3 +143,74 @@ class Planet(object):
                             len(self.teams_by_base[base].ants_set)))
         Buffer.extend(ext_inf)
         return "".join(Buffer)
+
+
+class API(object):
+    planet = None
+
+    def __init__(self, planet):
+        type(self).planet = planet
+        self.team = None
+
+    def Init(self, base):
+        planet = type(self).planet
+        self.team = type(self).planet.teams_by_base[base]
+
+    def get_team_id_by_base(self, base):
+        planet = type(self).planet
+        return planet.teams_by_base[base].team_id
+
+    def ask_for_spawn(self, AntClass=type(None)):
+        '''Обработка события "создать муравья". Возвращает True, если удалось, False иначе '''
+
+        planet = type(self).planet
+        AntClass = self.team.AntClass if AntClass is type(None) else AntClass
+        x_base, y_base = planet.coord_by_obj[self.team.base]
+        x_max, y_max = planet.size
+
+        # если ресурсов достаточно для создания
+        if self.team.food >= type(planet).cost_of_ant:
+            # может случиться, что возле базы нет свободной клетки
+            try:
+                x, y = choice([(x_base + dx, y_base + dy)
+                               for dx, dy in product(range(-1, 2), repeat=2)
+                               if (x_base + dx, y_base + dy) in planet.obj_by_coord
+                               and planet.obj_by_coord.get((x_base + dx, y_base + dy), None) is None])
+                ant = AntClass(base=self.team.base)
+                self.team.ants_set.update({ant})
+                planet.set_coord(obj=ant, coord=(x, y))
+                planet.obj_by_coord[x, y] = ant
+                self.team.food -= type(planet).cost_of_ant
+                return True
+            except IndexError:
+                return False
+        else:
+            return False
+
+    def get_list_of_ants(self):
+        return list(self.team.ants_set)
+
+    def get_food_quantity(self):
+        return self.team.food
+
+    def get_size_of_planet(self):
+        return type(self).planet.size
+
+    def get_cost_of_ant_spawn(self):
+        planet = type(self).planet
+        return planet.cost_of_ant
+
+    def get_type_from_cell(self, *coords):
+        planet = type(self).planet
+        if len(coords) == 1:    # дали кортеж (x, y)
+            coords = coords[0]
+        return type(planet.obj_by_coord.get(coords, None))
+
+    def get_coord(self, obj):
+        '''Возвращает кортеж координат объекта одного из классов: Ant, Base. Если объект не найден, вернет None '''
+        planet = type(self).planet
+        return planet.coord_by_obj.get(obj, None)
+
+    def cargo_load(self, ant):
+        planet = type(self).planet
+        return planet.cargo_by_ant.get(ant, 0)

@@ -4,7 +4,7 @@ import argparse
 from time import sleep
 from datetime import datetime
 
-from Planet import Planet, AntWarsTeam
+from AntWars import World, Team
 from BasicStrategy import BasicAnt, BasicBase
 
 
@@ -21,9 +21,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     log_name = datetime.now().strftime("%y-%m-%d-%H-%M-%S")
-    team1 = AntWarsTeam(AntClass=BasicAnt, BaseClass=BasicBase, team_id=1)
-    team2 = AntWarsTeam(AntClass=BasicAnt, BaseClass=BasicBase, team_id=2)
-    Earth = Planet(size=map(int, args.size.split()))
+    team1 = Team(AntClass=BasicAnt, BaseClass=BasicBase, team_id=1)
+    team2 = Team(AntClass=BasicAnt, BaseClass=BasicBase, team_id=2)
+    Earth = World(size=map(int, args.size.split()))
     Earth.Init(teams={team1, team2})
 
     while True:
