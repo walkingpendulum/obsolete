@@ -42,6 +42,7 @@ class World(object):
             if 0 <= uniform(0,1) < type(self).food_prob:
                 self.obj_by_coord[coord] = Food(randint(type(self).food_min_start_quantity_in_cell,
                                                         type(self).food_max_start_quantity_in_cell))
+
     def add_team(self, team):
         team.base = team.BaseClass()
         self.teams_by_base[team.base] = team
@@ -114,6 +115,31 @@ class World(object):
             self.obj_by_coord[dst_coord] = ant
             self.set_coord(obj=ant, coord=dst_coord)
 
+    def spawn(self, team, AntClass=type(None)):
+        '''Обработка события "создать муравья". Возвращает True, если удалось, False иначе '''
+
+        AntClass = team.AntClass if AntClass is type(None) else AntClass
+        x_base, y_base = self.coord_by_obj[team.base]
+
+        # если ресурсов достаточно для создания
+        if team.food >= type(self).cost_of_ant:
+            # может случиться, что возле базы нет свободной клетки
+            try:
+                x, y = choice([(x_base + dx, y_base + dy)
+                               for dx, dy in product(range(-1, 2), repeat=2)
+                               if (x_base + dx, y_base + dy) in self.obj_by_coord
+                               and self.obj_by_coord.get((x_base + dx, y_base + dy), None) is None])
+                ant = AntClass(base=team.base)
+                team.ants_set.update({ant})
+                self.set_coord(obj=ant, coord=(x, y))
+                self.obj_by_coord[x, y] = ant
+                team.food -= type(self).cost_of_ant
+                return True
+            except IndexError:
+                return False
+        else:
+            return False
+
     def advance(self):
         '''Ход планеты, он же игровой день'''
         for team in self.teams_by_base.itervalues():
@@ -144,7 +170,6 @@ class World(object):
         Buffer.extend(ext_inf)
         return "".join(Buffer)
 
-
 class API(object):
     planet = None
 
@@ -161,31 +186,8 @@ class API(object):
         return planet.teams_by_base[base].team_id
 
     def ask_for_spawn(self, AntClass=type(None)):
-        '''Обработка события "создать муравья". Возвращает True, если удалось, False иначе '''
-
         planet = type(self).planet
-        AntClass = self.team.AntClass if AntClass is type(None) else AntClass
-        x_base, y_base = planet.coord_by_obj[self.team.base]
-        x_max, y_max = planet.size
-
-        # если ресурсов достаточно для создания
-        if self.team.food >= type(planet).cost_of_ant:
-            # может случиться, что возле базы нет свободной клетки
-            try:
-                x, y = choice([(x_base + dx, y_base + dy)
-                               for dx, dy in product(range(-1, 2), repeat=2)
-                               if (x_base + dx, y_base + dy) in planet.obj_by_coord
-                               and planet.obj_by_coord.get((x_base + dx, y_base + dy), None) is None])
-                ant = AntClass(base=self.team.base)
-                self.team.ants_set.update({ant})
-                planet.set_coord(obj=ant, coord=(x, y))
-                planet.obj_by_coord[x, y] = ant
-                self.team.food -= type(planet).cost_of_ant
-                return True
-            except IndexError:
-                return False
-        else:
-            return False
+        return planet.spawn(self.team, AntClass)
 
     def get_list_of_ants(self):
         return list(self.team.ants_set)
