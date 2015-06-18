@@ -27,7 +27,7 @@ class World(object):
     hit_prob = 0.8      # вероятность убить муравья при ударе
     cost_of_ant = 5     # стоимость создания одного муравья
     food_prob = 0.3     # вероятность появления еды в клетке при создании планеты
-    food_min_start_quantity_in_cell = 3
+    food_min_start_quantity_in_cell = 3     #магические константы при рандоме еды для размещения в клетку
     food_max_start_quantity_in_cell = 7
 
     def __init__(self, size):
@@ -55,7 +55,7 @@ class World(object):
         # рандомим места для баз, размещаем их там и инициализируем
         coord_for_bases = sample(self.obj_by_coord, len(teams))
         for base, coord in zip(self.teams_by_base, coord_for_bases):
-            API_for_setup = API(planet=self)
+            API_for_setup = API(world=self)
             API_for_setup.Init(base)
             base.Init(API=API_for_setup)
             self.obj_by_coord[coord] = base
@@ -100,7 +100,7 @@ class World(object):
 
     def move(self, dst_coord, ant):
         old_coord = self.coord_by_obj[ant]
-        # todo: может быть стоит не пропускать ход в planet.move(), если перемещение некорректное, а бросать исключение?
+        # todo: может быть стоит не пропускать ход в world.move(), если перемещение некорректное, а бросать исключение?
         if dst_coord not in self.obj_by_coord:
             return
         elif old_coord == dst_coord:
@@ -171,48 +171,82 @@ class World(object):
         return "".join(Buffer)
 
 class API(object):
-    planet = None
+    world = None
 
-    def __init__(self, planet):
-        type(self).planet = planet
+    def __init__(self, world):
+        type(self).world = world
         self.team = None
 
     def Init(self, base):
-        planet = type(self).planet
-        self.team = type(self).planet.teams_by_base[base]
+        self.team = type(self).world.teams_by_base[base]
 
     def get_team_id_by_base(self, base):
-        planet = type(self).planet
-        return planet.teams_by_base[base].team_id
+        '''Возвращает идентификатор команды'''
+        world = type(self).world
+        return world.teams_by_base[base].team_id
 
     def ask_for_spawn(self, AntClass=type(None)):
-        planet = type(self).planet
-        return planet.spawn(self.team, AntClass)
+        '''Пытается создать нового муравья'''
+        world = type(self).world
+        return world.spawn(self.team, AntClass)
 
     def get_list_of_ants(self):
+        '''Возвращает копию списка живых муравьев вашей команды'''
         return list(self.team.ants_set)
+
+    def get_size_of_world(self):
+        '''Возвращает кортеж (x_size, y_size)'''
+        return type(self).world.size
+
+    def get_cost_of_ant_spawn(self):
+        '''Возвращает стоимость создания нового муравья'''
+        world = type(self).world
+        return world.cost_of_ant
+
+    def get_coord_by_obj(self, obj):
+        '''Возвращает кортеж координат заданного объекта'''
+        world = type(self).world
+        return world.coord_by_obj.get(obj, None)
+
+    def get_type_by_coord(self, *coords):
+        '''Возвращает тип объекта, находящегося по заданным координатам'''
+        world = type(self).world
+        if len(coords) == 1:    # дали кортеж (x, y)
+            coords = coords[0]
+        return type(world.obj_by_coord.get(coords, None))
+    
+    def get_food_load(self, *args):
+        '''Возвращает количество еды.
+
+        Если передается объект, то он должен быть экземпляром Ant, Base или иметь тип type(None).
+        Иначе это должны быть координаты -- либо два аргумента, либо кортеж (x, y) '''
+        world = type(self).world
+        obj_by_coord = lambda coord: world.obj_by_coord.get(coord, None)
+
+        if len(args) == 1:
+            smth = args[0]
+            if isinstance(smth, Base):
+                return world.teams_by_base[smth].food
+            elif isinstance(smth, Ant):
+                return world.cargo_by_ant.get(smth, 0)
+            elif isinstance(smth, Food):
+                return smth.food
+            elif isinstance(smth, type(None)):
+                return 0
+            elif (smth, tuple):
+                return self.get_food_load(obj_by_coord(smth))
+        else:
+            return get_food_by_coord(obj_by_coord(args))
+
+    #========== методы оставлены для обратной совместимости ========
+    
+    def get_size_of_planet(self): return self.get_size_of_world()
+    def get_coord(self, obj): return self.get_coord_by_obj(obj)
+    def get_type_from_cell(self, *coords): self.get_type_by_coord(*coords)
+
+    def cargo_load(self, ant):
+        world = type(self).world
+        return world.cargo_by_ant.get(ant, 0)
 
     def get_food_quantity(self):
         return self.team.food
-
-    def get_size_of_planet(self):
-        return type(self).planet.size
-
-    def get_cost_of_ant_spawn(self):
-        planet = type(self).planet
-        return planet.cost_of_ant
-
-    def get_type_from_cell(self, *coords):
-        planet = type(self).planet
-        if len(coords) == 1:    # дали кортеж (x, y)
-            coords = coords[0]
-        return type(planet.obj_by_coord.get(coords, None))
-
-    def get_coord(self, obj):
-        '''Возвращает кортеж координат объекта одного из классов: Ant, Base. Если объект не найден, вернет None '''
-        planet = type(self).planet
-        return planet.coord_by_obj.get(obj, None)
-
-    def cargo_load(self, ant):
-        planet = type(self).planet
-        return planet.cargo_by_ant.get(ant, 0)
