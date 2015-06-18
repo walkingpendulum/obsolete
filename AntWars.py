@@ -238,6 +238,17 @@ class API(object):
         else:
             return get_food_by_coord(obj_by_coord(args))
 
+    def is_enemy_by_coord(self, *coord):
+        if len(coord) == 1:
+            coord = coord[0]
+
+        world = type(self).world
+        other_ant = world.obj_by_coord.get(coord, None)
+        if not isinstance(other_ant, Ant):
+            return False
+        else:
+            return world.teams_by_base[self.base] == world.teams_by_base[other_ant.base]
+
     #========== методы оставлены для обратной совместимости ========
     
     def get_size_of_planet(self): return self.get_size_of_world()
