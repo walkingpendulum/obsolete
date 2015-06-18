@@ -3,7 +3,8 @@
     moves: 'hit', 'move', 'take_food', 'drop_food'
 '''
 from random import choice
-from Planet import Food, Base, Ant
+from Base import Base
+from Ant import Ant
 
 
 class BasicBase(Base):
