@@ -23,7 +23,7 @@ if __name__ == '__main__':
     log_name = datetime.now().strftime("%y-%m-%d-%H-%M-%S")
     team1 = Team(AntClass=BasicAnt, BaseClass=BasicBase, team_id=1)
     team2 = Team(AntClass=BasicAnt, BaseClass=BasicBase, team_id=2)
-    Earth = World(size=map(int, args.size.split()))
+    Earth = World(size=tuple(map(int, args.size.split())))
     Earth.Init(teams={team1, team2})
 
     while True:

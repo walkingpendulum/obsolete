@@ -58,11 +58,15 @@ class World(object):
             API_for_setup = API(world=self)
             API_for_setup.Init(base)
             base.Init(API=API_for_setup)
-            self.obj_by_coord[coord] = base
-            self.set_coord(obj=base, coord=coord)
+            self.set_obj_coord_relation(obj=base, coord=coord)
 
-    def set_coord(self, obj, coord):
+    def set_obj_coord_relation(self, obj, coord):
         self.coord_by_obj[obj] = coord
+        self.obj_by_coord[coord] = obj
+
+    def del_obj(self, obj):
+        self.obj_by_coord[self.coord_by_obj[obj]] = None
+        del self.coord_by_obj[obj]
 
     def hit(self, dst_coord, ant):
         enemy = self.obj_by_coord.get(dst_coord, None)
@@ -72,8 +76,8 @@ class World(object):
             if 0 <= uniform(0, 1) <= type(self).hit_prob:
                 # удаляем муравья отовсюду
                 self.teams_by_base[enemy.base].ants_set.difference_update({enemy})
-                self.coord_by_obj.pop(enemy)
-                self.cargo_by_ant.pop(enemy, default=None)
+                self.del_obj(enemy)
+                self.cargo_by_ant.pop(enemy, None)
 
     def drop_food(self, dst_coord, ant):
         obj = self.obj_by_coord.get(dst_coord, None)
@@ -112,8 +116,7 @@ class World(object):
         else:
             old_coord = self.coord_by_obj[ant]
             self.obj_by_coord[old_coord] = None
-            self.obj_by_coord[dst_coord] = ant
-            self.set_coord(obj=ant, coord=dst_coord)
+            self.set_obj_coord_relation(obj=ant, coord=dst_coord)
 
     def spawn(self, team, AntClass=type(None)):
         '''Обработка события "создать муравья". Возвращает True, если удалось, False иначе '''
@@ -125,14 +128,13 @@ class World(object):
         if team.food >= type(self).cost_of_ant:
             # может случиться, что возле базы нет свободной клетки
             try:
-                x, y = choice([(x_base + dx, y_base + dy)
+                coord = choice([(x_base + dx, y_base + dy)
                                for dx, dy in product(range(-1, 2), repeat=2)
                                if (x_base + dx, y_base + dy) in self.obj_by_coord
                                and self.obj_by_coord.get((x_base + dx, y_base + dy), None) is None])
                 ant = AntClass(base=team.base)
                 team.ants_set.update({ant})
-                self.set_coord(obj=ant, coord=(x, y))
-                self.obj_by_coord[x, y] = ant
+                self.set_obj_coord_relation(obj=ant, coord=coord)
                 team.food -= type(self).cost_of_ant
                 return True
             except IndexError:
@@ -247,7 +249,7 @@ class API(object):
         if not isinstance(other_ant, Ant):
             return False
         else:
-            return world.teams_by_base[self.base] == world.teams_by_base[other_ant.base]
+            return self.team != world.teams_by_base[other_ant.base]
 
     #========== методы оставлены для обратной совместимости ========
     
