@@ -9,7 +9,6 @@ from AntWarsAPI import AntWarsAPI
 
 class Food(object):
     '''Обертка для еды'''
-    prob = 0.3      # вероятность появления в клетке при создании планеты
     label = 'f'
 
     def __init__(self, food):
@@ -29,6 +28,9 @@ class Planet(object):
     '''Игровой мир: игровое поле, обработка ходов команд, перемещение муравьев'''
     hit_prob = 0.5      # вероятность убить муравья при ударе
     cost_of_ant = 5     # стоимость создания одного муравья
+    food_prob = 0.3     # вероятность появления еды в клетке при создании планеты
+    food_min_quantity = 3
+    food_max_quantity = 7
 
     def __init__(self, size):
         self.size = size
@@ -39,9 +41,9 @@ class Planet(object):
 
         for coord in product(*map(range, self.size)):
             self.land[coord] = None
-            if 0 <= uniform(0,1) < Food.prob:
-                # здесь магические константы для количества еды
-                self.land[coord] = Food(randint(1, 5))
+            if 0 <= uniform(0,1) < type(self).food_prob:
+                food_max, food_min = type(self).food_max_quantity, type(self).food_min_quantity
+                self.land[coord] = Food(randint(food_min, food_max))
 
     def Init(self, teams):
         for team in teams:
