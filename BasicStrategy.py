@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
     ant.move() -> (destination_coord, move)
     moves: 'hit', 'move', 'take_food', 'drop_food'
@@ -92,7 +93,7 @@ class BasicHarvester(BasicAnt):
     def seek_for_food(self):
         pass
 
-    def move(self)
+    def move(self):
         if self.base.API.get_food_load(self):
             return self.move_toward_the_base()
         else:
