@@ -26,6 +26,7 @@ class World(object):
     '''Игровой мир: игровое поле, обработка ходов команд, перемещение муравьев'''
     hit_prob = 0.8      # вероятность убить муравья при ударе
     cost_of_ant = 5     # стоимость создания одного муравья
+    start_food_multiplier = 3   # на сколько муравьев хватит стартовой еды 
     food_prob = 0.3     # вероятность появления еды в клетке при создании планеты
     food_min_start_quantity_in_cell = 3     #магические константы при рандоме еды для размещения в клетку
     food_max_start_quantity_in_cell = 7
@@ -46,7 +47,7 @@ class World(object):
     def add_team(self, team):
         team.base = team.BaseClass()
         self.teams_by_base[team.base] = team
-        team.food = 3 * type(self).cost_of_ant
+        team.food = type(self).start_food_multiplier * type(self).cost_of_ant
 
     def Init(self, teams):
         for team in teams:
