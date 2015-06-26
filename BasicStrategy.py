@@ -95,7 +95,6 @@ class BasicRanger(BasicAnt):
             if self.base.API.get_coord_by_obj(self) == self.next_cell_for_patrol:
                 self.set_next_cell_for_patrol()
             new_coord = self.patrol()
-            print self.base.API.get_coord_by_obj(self), 'move', new_coord
             return (new_coord, 'move')
 
 class BasicHarvester(BasicAnt):
