@@ -7,6 +7,7 @@ class Painter:
         self.width = width
         self.height = height
         self.master = Tk()
+        self.master['bg'] = 'black'
         self.master.title('Ant Wars')
         self.cellSize = 10
         self.canvas = Canvas(self.master, width=width * self.cellSize, height=height * self.cellSize)
@@ -30,7 +31,6 @@ class Painter:
             while isClose(hexToRGB(self.teamColors[i]), (255, 255, 255)) or\
                   isClose(hexToRGB(self.teamColors[i]), (0, 0, 0)) or\
                   isClose(hexToRGB(self.teamColors[i]), (255, 0, 0)) or\
-                  isClose(hexToRGB(self.teamColors[i]), hexToRGB(self.master['bg'])) or\
                   isCloseWithOther(i):
                 self.teamColors[i] = ("#%06x" % random.randint(0,0xFFFFFF))
         self.stats = []
@@ -39,7 +39,7 @@ class Painter:
         for i in range(len(self.teamColors)):
             self.stats.append(StringVar())
             self.stats[i].set(statsSrc[i])
-            self.statsLabels.append(Label(self.master, textvariable=self.stats[i], fg=self.teamColors[i]))
+            self.statsLabels.append(Label(self.master, textvariable=self.stats[i], fg=self.teamColors[i], bg='black'))
             self.statsLabels[i].pack()
 
     def update(self, inst):
