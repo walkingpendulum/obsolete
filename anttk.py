@@ -11,9 +11,28 @@ class Painter:
         self.cellSize = 10
         self.canvas = Canvas(self.master, width=width * self.cellSize, height=height * self.cellSize)
         self.canvas.pack()
+        def hexToRGB(s):
+            red = int(s[1:3], base=16)
+            green = int(s[3:5], base=16)
+            blue = int(s[5:7], base=16)
+            return red, green, blue
+        def isClose(la, ra):
+            print la, ra
+            return abs(la[0] - ra[0]) + abs(la[1] - ra[1]) + abs(la[2] - ra[2]) < 150
+        def isCloseWithOther(j):
+            for i in range(j):
+                if isClose(hexToRGB(self.teamColors[j]), hexToRGB(self.teamColors[i])):
+                    return True
+            return False
         self.teamColors = []
         for i in range(len(earth.teams_by_base)):
             self.teamColors.append("#%06x" % random.randint(0,0xFFFFFF))
+            while isClose(hexToRGB(self.teamColors[i]), (255, 255, 255)) or\
+                  isClose(hexToRGB(self.teamColors[i]), (0, 0, 0)) or\
+                  isClose(hexToRGB(self.teamColors[i]), (255, 0, 0)) or\
+                  isClose(hexToRGB(self.teamColors[i]), hexToRGB(self.master['bg'])) or\
+                  isCloseWithOther(i):
+                self.teamColors[i] = ("#%06x" % random.randint(0,0xFFFFFF))
         self.stats = []
         self.statsLabels = []
         statsSrc = sorted(str(earth)[width * height:].split('\n'))
