@@ -11,7 +11,7 @@ class Painter:
         self.master.title('Ant Wars')
         self.cellSize = 10
         self.canvas = Canvas(self.master, width=width * self.cellSize, height=height * self.cellSize)
-        self.canvas.pack()
+        self.canvas.pack(ipadx=0, ipady=0)
         def hexToRGB(s):
             red = int(s[1:3], base=16)
             green = int(s[3:5], base=16)
