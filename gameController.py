@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from Tkinter import *
-from AntWars import Food, Base
-import random
+from World import Food, Base, World
+from random import randint
 
 BG_COLOR = 'white'
 EMPTY_CELL_COLOR = 'blanched almond'
@@ -11,10 +11,10 @@ BASE_COLOR = 'black'
 CELL_SIZE = 20
 
 class gameController:
-    def __init__(self, world, delay):
-        self.world = world
+    def __init__(self, size, delay, log_name):
+        self.world = World(size, log_name)
         self.delay = delay
-        self.width, self.height = world.size
+        self.width, self.height = size
         self.master = Tk()
         self.canvas = Canvas(self.master,
                              width=self.width * CELL_SIZE,
@@ -22,7 +22,9 @@ class gameController:
                              bg=BG_COLOR
                              )
 
-    def Init(self):
+    def Init(self, teams):
+        self.world.Init(teams)
+
         self.master['bg'] = BG_COLOR
         self.master.title('Ant Wars')
         self.canvas.pack(ipadx=0, ipady=0)
@@ -48,7 +50,7 @@ class gameController:
                     or isClose(hexToRGB(newColor), (255, 0, 0)) \
                     or isCloseWithOther(newColor)\
                     :
-                newColor = ("#%06x" % random.randint(0, 0xFFFFFF))
+                newColor = ("#%06x" % randint(0, 0xFFFFFF))
             self.teamColors.append(newColor)
 
         # отрисовываем статистику

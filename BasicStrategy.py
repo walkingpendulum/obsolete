@@ -7,7 +7,7 @@ from random import choice, randint
 from itertools import product
 from Base import Base
 from Ant import Ant
-from AntWars import Food
+from World import Food
 
 def dist(old_coord, new_coord):
     return max(abs(old_coord[0] - new_coord[0]), abs(old_coord[1] - new_coord[1]))
