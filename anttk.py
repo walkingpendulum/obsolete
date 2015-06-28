@@ -1,64 +1,95 @@
+# -*- coding: utf-8 -*-
+
 from Tkinter import *
-import AntWars
+from AntWars import Food, Base
 import random
 
-class Painter:
-    def __init__(self, width, height, earth):
-        self.width = width
-        self.height = height
+BG_COLOR = 'white'
+EMPTY_CELL_COLOR = 'blanched almond'
+FOOD_COLOR = 'lime green'
+BASE_COLOR = 'black'
+CELL_SIZE = 20
+
+class gameController:
+    def __init__(self, world, delay):
+        self.world = world
+        self.delay = delay
+        self.width, self.height = world.size
         self.master = Tk()
-        self.master['bg'] = 'black'
+        self.canvas = Canvas(self.master,
+                             width=self.width * CELL_SIZE,
+                             height=self.height * CELL_SIZE,
+                             bg=BG_COLOR
+                             )
+
+    def Init(self):
+        self.master['bg'] = BG_COLOR
         self.master.title('Ant Wars')
-        self.cellSize = 10
-        self.canvas = Canvas(self.master, width=width * self.cellSize, height=height * self.cellSize)
         self.canvas.pack(ipadx=0, ipady=0)
+
         def hexToRGB(s):
-            red = int(s[1:3], base=16)
-            green = int(s[3:5], base=16)
-            blue = int(s[5:7], base=16)
-            return red, green, blue
+            return map(lambda x: int(x, base=16), [s[i:i+2] for i in range(1, 7, 2)])
+
         def isClose(la, ra):
-            print la, ra
-            return abs(la[0] - ra[0]) + abs(la[1] - ra[1]) + abs(la[2] - ra[2]) < 150
-        def isCloseWithOther(j):
-            for i in range(j):
-                if isClose(hexToRGB(self.teamColors[j]), hexToRGB(self.teamColors[i])):
-                    return True
-            return False
+            return abs(la[0] - ra[0]) < 40\
+                   or abs(la[1] - ra[1]) < 40 \
+                   or abs(la[2] - ra[2]) < 40
+
+        def isCloseWithOther(newColor):
+            return any(isClose(hexToRGB(newColor), hexToRGB(color)) for color in self.teamColors)
+
+        # рандомим цвета для команд
         self.teamColors = []
-        for i in range(len(earth.teams_by_base)):
-            self.teamColors.append("#%06x" % random.randint(0,0xFFFFFF))
-            while isClose(hexToRGB(self.teamColors[i]), (255, 255, 255)) or\
-                  isClose(hexToRGB(self.teamColors[i]), (0, 0, 0)) or\
-                  isClose(hexToRGB(self.teamColors[i]), (255, 0, 0)) or\
-                  isCloseWithOther(i):
-                self.teamColors[i] = ("#%06x" % random.randint(0,0xFFFFFF))
+        for i in range(len(self.world.teams_by_base)):
+            newColor = ''
+            while not newColor \
+                    or isClose(hexToRGB(newColor), (255, 255, 255)) \
+                    or isClose(hexToRGB(newColor), (0, 0, 0)) \
+                    or isClose(hexToRGB(newColor), (255, 0, 0)) \
+                    or isCloseWithOther(newColor)\
+                    :
+                newColor = ("#%06x" % random.randint(0, 0xFFFFFF))
+            self.teamColors.append(newColor)
+
+        # отрисовываем статистику
         self.stats = []
-        self.statsLabels = []
-        statsSrc = sorted(str(earth)[width * height:].split('\n'))
+        # todo: тут адский ад со сбором статистики, нужно прикрутить нормальную
+        statsSrc = sorted(str(self.world)[self.width * self.height:].split('\n'))
         for i in range(len(self.teamColors)):
             self.stats.append(StringVar())
             self.stats[i].set(statsSrc[i])
-            self.statsLabels.append(Label(self.master, textvariable=self.stats[i], fg=self.teamColors[i], bg='black'))
-            self.statsLabels[i].pack()
+            Label(self.master, textvariable=self.stats[i], fg=self.teamColors[i], bg=BG_COLOR).pack()
 
-    def update(self, inst):
+    def repaint(self):
         self.canvas.delete(ALL)
-        cs = self.cellSize
-        field = inst.split('\n')
+        field = str(self.world).split('\n')
         for line in range(self.height):
             for cell in range(self.width):
                 char = field[line][cell]
                 if char == ' ':
-                    color = 'white'
-                elif char == AntWars.Food.label:
-                    color = 'red'
-                elif char == AntWars.Base.label:
-                    color = 'black'
+                    color = EMPTY_CELL_COLOR
+                elif char == Food.label:
+                    color = FOOD_COLOR
+                elif char == Base.label:
+                    color = BASE_COLOR
                 else:
                     color = self.teamColors[int(char) - 1]
-                self.canvas.create_rectangle(cell * cs, line * cs, (cell + 1) * cs, (line + 1) * cs, fill=color)
+                self.canvas.create_rectangle(cell * CELL_SIZE,
+                                             line * CELL_SIZE,
+                                             (cell + 1) * CELL_SIZE,
+                                             (line + 1) * CELL_SIZE,
+                                             fill=color,
+                                             outline=EMPTY_CELL_COLOR
+                                             )
         statsSrc = sorted(field[self.height:])[1:]
         for i in range(len(statsSrc)):
             self.stats[i].set(statsSrc[i])
-        
+
+    def advance(self):
+        self.world.advance()
+        self.repaint()
+        self.master.after(self.delay, self.advance)
+
+    def launch(self):
+        self.master.after(1, self.advance)
+        self.master.mainloop()

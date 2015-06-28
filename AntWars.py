@@ -31,7 +31,8 @@ class World(object):
     food_min_start_quantity_in_cell = 3     #магические константы при рандоме еды для размещения в клетку
     food_max_start_quantity_in_cell = 7
 
-    def __init__(self, size):
+    def __init__(self, size, log_name):
+        self.log_name = log_name
         self.size = size
         self.coord_by_obj = dict()
         self.obj_by_coord = dict()
@@ -152,6 +153,16 @@ class World(object):
                 # todo: вставить проверку на то, что муравей не прыгнул дальше одной клетки
                 getattr(self, move)(dst_coord, ant)
 
+        # срабатывает, если при запуске был задан флаг --logs
+        self.dump()
+
+    def dump(self):
+        ''' Сбрасывает текущее состояние поля str(world) в файл filename.'''
+        # если при запуске флаг "--logs" не был указан, то self.log_name == None
+        if self.log_name:
+            with open(self.log_name, mode='a') as f:
+                f.write(str(self).replace('\n', '$') + '\n')
+
     def __str__(self):
         Buffer = list()
         for y in range(self.size[1]):
@@ -172,6 +183,7 @@ class World(object):
                             len(self.teams_by_base[base].ants_set)))
         Buffer.extend(ext_inf)
         return "".join(Buffer)
+
 
 class API(object):
     world = None
