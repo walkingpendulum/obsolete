@@ -79,16 +79,3 @@ class API(object):
             return False
         else:
             return self.team != world.teams_by_base[other_ant.base]
-
-    #========== методы оставлены для обратной совместимости ========
-    
-    def get_size_of_planet(self): return self.get_size_of_world()
-    def get_coord(self, obj): return self.get_coord_by_obj(obj)
-    def get_type_from_cell(self, *coords): self.get_type_by_coord(*coords)
-
-    def cargo_load(self, ant):
-        world = type(self).world
-        return world.cargo_by_ant.get(ant, 0)
-
-    def get_food_quantity(self):
-        return self.team.food
