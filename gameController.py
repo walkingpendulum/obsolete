@@ -10,6 +10,14 @@ from itertools import izip
 
 class gameController:
     def __init__(self, size, delay, log_name, themeStr):
+        def loadTheme(self, themeStr):
+            if not os.path.isfile('themes/' + themeStr + '.py'):
+                raise ValueError('Incorrect theme specified.')
+            with open('themes/' + themeStr + '.py') as themeFile:
+                exec(themeFile.read())
+            if not hasattr(self, 'theme'):
+                raise ValueError('Smth goes wrong, theme loading crashed')
+
         # todo: написать спецификацию для loadTheme() и файлов с темами
         self.loadTheme(themeStr)
         self.world = World(size, log_name)
@@ -80,12 +88,6 @@ class gameController:
             createCell(coord, obj)
         for stringVar, line in izip(self.statStringVars, self.world.getTeamStatList()):
             stringVar.set(line)
-
-    def loadTheme(self, themeStr):
-        if not os.path.isfile('themes/' + themeStr + '.py'):
-            raise ValueError('Incorrect theme specified.')
-        with open('themes/' + themeStr + '.py') as themeFile:
-            exec(themeFile.read())
 
     def advance(self):
         self.world.advance()
