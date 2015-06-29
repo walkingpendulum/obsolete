@@ -8,8 +8,6 @@ from API import API
 
 class Food(object):
     '''Обертка для еды'''
-    label = 'f'
-
     def __init__(self, food):
         self.food = food
 

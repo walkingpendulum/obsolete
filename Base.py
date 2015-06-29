@@ -2,8 +2,6 @@
 
 class Base(object):
     '''Базовый класс муравейника. Кастомные классы муравейников должны быть отнаследованы от него.'''
-    label = 'B'
-
     def __init__(self):
         self.team_id = None
         self.API = None
