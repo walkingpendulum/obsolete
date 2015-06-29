@@ -1,4 +1,4 @@
-theme = {
+self.theme = {
     'BG_COLOR': 'white',
     'EMPTY_CELL_COLOR': 'blanched almond',
     'OUTLINE_COLOR':'blanched almond',

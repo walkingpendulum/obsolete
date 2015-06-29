@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 
+import sys
+import os.path
 from Tkinter import *
 from World import Food, Base, World
 from random import randint
 
 class gameController:
-    def __init__(self, size, delay, log_name, theme):
+    def __init__(self, size, delay, log_name, themeStr):
         self.world = World(size, log_name)
         self.delay = delay
         self.width, self.height = size
-        self.theme = theme
+        self.theme = None
+        self.loadTheme(themeStr)
         self.master = Tk()
         self.canvas = Canvas(self.master,
                              width=self.width * self.theme['CELL_SIZE'],
@@ -81,6 +84,14 @@ class gameController:
         statsSrc = sorted(field[self.height:])[1:]
         for i in range(len(statsSrc)):
             self.stats[i].set(statsSrc[i])
+
+    def loadTheme(self, themeStr):
+        if not os.path.isfile('themes/' + themeStr + '.py'):
+            raise ValueError('Incorrect theme specified.')
+        with open('themes/' + themeStr + '.py') as themeFile:
+            exec(themeFile.read())
+#        if 'theme' not in globals():
+#            raise ValueError('Incorrect theme specified.')
 
     def advance(self):
         self.world.advance()
