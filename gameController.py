@@ -58,8 +58,8 @@ class gameController:
         self.master['bg'] = self.theme['BG_COLOR']
         self.canvas.pack(ipadx=0, ipady=0)
         self.world.Init(teams)
-        self.teamColors = [getNewColor() for _ in self.world.teams_by_base]
-        self.statStringVars = [StringVar() for _ in self.world.teams_by_base]
+        self.teamColors = [getNewColor() for _ in sorted(self.world.teams_by_base, key=lambda base: base.team_id)]
+        self.statStringVars = [StringVar() for _ in sorted(self.world.teams_by_base, key=lambda base: base.team_id)]
         for stringVar, color in izip(self.statStringVars, self.teamColors):
             lbl = Label(self.master, textvariable=stringVar, fg=color, bg=self.theme['BG_COLOR'])
             lbl.pack()

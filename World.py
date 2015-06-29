@@ -182,6 +182,6 @@ class World(object):
     def getTeamStatList(self):
         return ['Team %d: food %d, ants %d' %
                 (base.team_id,
-                 team.food,
-                 len(team.ants_set)
-                ) for base, team in self.teams_by_base.items()]
+                 self.teams_by_base[base].food,
+                 len(self.teams_by_base[base].ants_set)
+                ) for base in sorted(self.teams_by_base, key=lambda base: base.team_id)]
