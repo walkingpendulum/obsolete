@@ -176,11 +176,12 @@ class World(object):
                 Buffer.append(label)
             Buffer.append('\n')
 
-        ext_inf = list()
-        for base in self.teams_by_base:
-            ext_inf.append('Team %d: food %d, ants %d\n' %
-                           (base.team_id,
-                            self.teams_by_base[base].food,
-                            len(self.teams_by_base[base].ants_set)))
-        Buffer.extend(ext_inf)
+        Buffer.extend([line + '\n' for line in self.getTeamStatList()])
         return "".join(Buffer)
+
+    def getTeamStatList(self):
+        return ['Team %d: food %d, ants %d' %
+                (base.team_id,
+                 team.food,
+                 len(team.ants_set)
+                ) for base, team in self.teams_by_base.items()]
