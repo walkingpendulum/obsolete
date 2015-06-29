@@ -4,28 +4,23 @@ from Tkinter import *
 from World import Food, Base, World
 from random import randint
 
-BG_COLOR = 'white'
-EMPTY_CELL_COLOR = 'blanched almond'
-FOOD_COLOR = 'lime green'
-BASE_COLOR = 'black'
-CELL_SIZE = 20
-
 class gameController:
-    def __init__(self, size, delay, log_name):
+    def __init__(self, size, delay, log_name, theme):
         self.world = World(size, log_name)
         self.delay = delay
         self.width, self.height = size
+        self.theme = theme
         self.master = Tk()
         self.canvas = Canvas(self.master,
-                             width=self.width * CELL_SIZE,
-                             height=self.height * CELL_SIZE,
-                             bg=BG_COLOR
+                             width=self.width * self.theme['CELL_SIZE'],
+                             height=self.height * self.theme['CELL_SIZE'],
+                             bg=self.theme['BG_COLOR']
                              )
 
     def Init(self, teams):
         self.world.Init(teams)
 
-        self.master['bg'] = BG_COLOR
+        self.master['bg'] = self.theme['BG_COLOR']
         self.master.title('Ant Wars')
         self.canvas.pack(ipadx=0, ipady=0)
 
@@ -60,7 +55,7 @@ class gameController:
         for i in range(len(self.teamColors)):
             self.stats.append(StringVar())
             self.stats[i].set(statsSrc[i])
-            Label(self.master, textvariable=self.stats[i], fg=self.teamColors[i], bg=BG_COLOR).pack()
+            Label(self.master, textvariable=self.stats[i], fg=self.teamColors[i], bg=self.theme['BG_COLOR']).pack()
 
     def repaint(self):
         self.canvas.delete(ALL)
@@ -69,19 +64,19 @@ class gameController:
             for cell in range(self.width):
                 char = field[line][cell]
                 if char == ' ':
-                    color = EMPTY_CELL_COLOR
+                    color = self.theme['EMPTY_CELL_COLOR']
                 elif char == Food.label:
-                    color = FOOD_COLOR
+                    color = self.theme['FOOD_COLOR']
                 elif char == Base.label:
-                    color = BASE_COLOR
+                    color = self.theme['BASE_COLOR']
                 else:
                     color = self.teamColors[int(char) - 1]
-                self.canvas.create_rectangle(cell * CELL_SIZE,
-                                             line * CELL_SIZE,
-                                             (cell + 1) * CELL_SIZE,
-                                             (line + 1) * CELL_SIZE,
+                self.canvas.create_rectangle(cell * self.theme['CELL_SIZE'],
+                                             line * self.theme['CELL_SIZE'],
+                                             (cell + 1) * self.theme['CELL_SIZE'],
+                                             (line + 1) * self.theme['CELL_SIZE'],
                                              fill=color,
-                                             outline=EMPTY_CELL_COLOR
+                                             outline=self.theme['OUTLINE_COLOR']
                                              )
         statsSrc = sorted(field[self.height:])[1:]
         for i in range(len(statsSrc)):
