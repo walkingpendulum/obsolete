@@ -27,7 +27,7 @@ class BasicBase(Base):
             variety = [(rangers_quantity, BasicRanger, type(self).max_ranger_quantity),
                        (harvesters_quantity, BasicHarvester, type(self).max_harvester_quantity)]
             f, cls, q_max = choice(variety)
-            if f() < q_max and self.API.get_cost_of_ant_spawn() <= self.API.get_food_quantity():
+            if f() < q_max and self.API.get_cost_of_ant_spawn() <= self.API.get_food_load(self):
                 self.API.ask_for_spawn(AntClass=cls)
 
     def ask_for_move(self, ant):
@@ -139,5 +139,5 @@ class BasicHarvester(BasicAnt):
 
             return (coord_new, move)
 
-        return compute_next_move_for_ant_w_food(self) if self.base.API.cargo_load(self) > 0 \
+        return compute_next_move_for_ant_w_food(self) if self.base.API.get_food_load(self) > 0 \
                     else compute_next_move_for_ant_wo_food(self)

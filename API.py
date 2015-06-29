@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from Ant import Ant
+from Base import Base
 
 class API(object):
     world = None
