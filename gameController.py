@@ -9,15 +9,15 @@ from random import randint
 from itertools import izip
 
 class gameController:
-    def __init__(self, size, delay, log_name, themeStr):
-        def loadTheme(self, themeStr):
-            if not os.path.isfile('themes/' + themeStr + '.py'):
-                raise ValueError('Incorrect theme specified.')
-            with open('themes/' + themeStr + '.py') as themeFile:
-                exec(themeFile.read())
-            if not hasattr(self, 'theme'):
-                raise ValueError('Smth goes wrong, theme loading crashed')
+    def loadTheme(self, themeStr):
+        if not os.path.isfile('themes/' + themeStr + '.py'):
+            raise ValueError('Incorrect theme specified.')
+        with open('themes/' + themeStr + '.py') as themeFile:
+            exec(themeFile.read())
+        if not hasattr(self, 'theme'):
+            raise ValueError('Smth goes wrong, theme loading crashed')
 
+    def __init__(self, size, delay, log_name, themeStr):
         # todo: написать спецификацию для loadTheme() и файлов с темами
         self.loadTheme(themeStr)
         self.world = World(size, log_name)
@@ -65,7 +65,7 @@ class gameController:
             lbl.pack()
 
     def repaint(self):
-        def createCell(coord, ob):
+        def createCell(coord, obj):
             x, y = coord
             if obj is None:
                 color = self.theme['EMPTY_CELL_COLOR']
