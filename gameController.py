@@ -7,6 +7,7 @@ from Base import Base
 from Ant import Ant
 from random import randint
 from itertools import izip
+from functools import partial
 
 class gameController:
     def loadTheme(self, themeStr):
@@ -33,7 +34,7 @@ class gameController:
 
     def Init(self, teams):
         def hexToRGB(s):
-            return map(lambda x: int(x, base=16), [s[i:i+2] for i in range(1, 7, 2)])
+            return map(partial(int, base=16), [s[i:i+2] for i in range(1, 7, 2)])
 
         def isClose(la, ra):
             return abs(la[0] - ra[0]) < 40\
