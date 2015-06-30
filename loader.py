@@ -1,7 +1,7 @@
 import os.path
 
 class Strategy:
-    def __init__(self, name, descritpion, version, BaseClass, AntClass):
+    def __init__(self, name, description, version, BaseClass, AntClass):
         self.name = name
         self.description = description
         self.version = version
@@ -14,12 +14,12 @@ class Loader:
     
     def loadStrategy(self, strategyName):
         data = dict()
-        if not os.path.isfile('strategies/' + straregyName + '.py'):
+        if not os.path.isfile('strategies/' + strategyName + '.py'):
             raise ValueError('Incorrect strategy specified.')
-        with open('strategies/' + straregyName + '.py') as strategyFile:
+        with open('strategies/' + strategyName + '.py') as strategyFile:
             exec(strategyFile.read(), data)
         manifest = data['MANIFEST']
-        if type(manifest) != type(dict()) or 'BaseClass' not in mainfest or 'AntClass' not in manifest:
+        if type(manifest) != type(dict()) or 'BaseClass' not in manifest or 'AntClass' not in manifest:
             raise ValueError('Incorrect strategy specified.')
         if 'description' not in manifest:
             manifest['description'] = '...'

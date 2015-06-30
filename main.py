@@ -4,8 +4,9 @@ import argparse
 from datetime import datetime
 
 from World import Team
-from BasicStrategy import BasicAnt, BasicBase
 from gameController import gameController
+from ChooseDialog import ChooseDialog
+from loader import Strategy
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -17,13 +18,19 @@ if __name__ == '__main__':
     args = parser.parse_args()
     log_name = datetime.now().strftime("%y-%m-%d-%H-%M-%S") if args.logs_flag else None
 
-    team1 = Team(AntClass=BasicAnt, BaseClass=BasicBase, team_id=1)
-    team2 = Team(AntClass=BasicAnt, BaseClass=BasicBase, team_id=2)
+    # team1 = Team(AntClass=BasicAnt, BaseClass=BasicBase, team_id=1)
+    # team2 = Team(AntClass=BasicAnt, BaseClass=BasicBase, team_id=2)
+    teams = set()
+    strategies = []
+    ChooseDialog(strategies)
+    for i in range(len(strategies)):
+        teams.update({Team(AntClass=strategies[i].AntClass, BaseClass=strategies[i].BaseClass, team_id=i + 1)})
+    
     AntWarsGame = gameController(size=tuple(map(int, args.size.split())),
                                  delay=args.delay,
                                  log_name=log_name,
                                  themeStr=args.theme
                                  )
 
-    AntWarsGame.Init(teams={team1, team2})
+    AntWarsGame.Init(teams=teams)
     AntWarsGame.launch()
