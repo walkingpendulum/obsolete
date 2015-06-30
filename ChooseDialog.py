@@ -9,7 +9,6 @@ class ChooseDialog:
         top = self.top = Tk()
         self.index = []
         Label(top, text='Choose strategies (just close this window when ready):').grid(row=0, columnspan=2, sticky=W)
-        row = 1
         for filename in os.listdir('strategies'):
             self.index.append(self.lo.loadStrategy(filename[:-3]))
         names = [o.name + ' ' + o.version for o in self.index]
