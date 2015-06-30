@@ -7,10 +7,8 @@ class ChooseDialog:
         self.result = result
         self.lo = Loader()
         top = self.top = Tk()
-        self.index = []
         Label(top, text='Choose strategies (just close this window when ready):').grid(row=0, columnspan=2, sticky=W)
-        for filename in os.listdir('strategies'):
-            self.index.append(self.lo.loadStrategy(filename[:-3]))
+        self.index = [self.lo.loadStrategy(filename[:-3]) for filename in os.listdir('strategies')]
         names = [o.name + ' ' + o.version for o in self.index]
         self.selected = StringVar()
         self.selected.set(names[0])
