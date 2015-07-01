@@ -29,4 +29,4 @@ class Loader:
         return Strategy(**manifest)
     
     def loadStrategies(self, strategyNames):
-        return [loadStrategy(name) for name in strategyNames]
+        return [self.loadStrategy(name) for name in strategyNames]
