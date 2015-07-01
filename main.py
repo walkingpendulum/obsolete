@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--delay', type=int, dest='delay', default=500, help='Delay between turns in ms.')
     parser.add_argument('--logs', action='store_true', dest='logs_flag', help='Enable logs gathering.')
     parser.add_argument('-t', '--theme', type=str, dest='theme', default='constructor', help='Theme for graphical interface.')
-    parser.add_argument('-a', '--algorithms', type=str, dest='strategies', action='append', help='Specifes one strategy. Use few -s to specify few strategies')
+    parser.add_argument('-a', '--algorithm', type=str, dest='strategies', action='append', help='Specifes one strategy. Use few -a to specify few strategies')
    
     args = parser.parse_args()
     
