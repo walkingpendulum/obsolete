@@ -32,11 +32,7 @@ class ConfigDialog:
         self.stratList.grid(row=1, column=1, rowspan=2, sticky=NS)
         
         # "Delete" button for strategies.
-<<<<<<< HEAD
         Button(self.master, text='Delete', command=lambda lb=self.stratList: lb.delete(ANCHOR)).grid(row=3, column=1)
-=======
-        Button(self.master, text='Delete', command=lambda lb=self.list: lb.delete(ANCHOR)).grid(row=3, column=1)
->>>>>>> 119308d9bc1d2f85561de24f5e29dbc0d593ec6a
         
         # Themes combo box.
         Label(self.master, text='Choose theme:').grid(row=4, column=0, sticky=W)
@@ -67,20 +63,12 @@ class ConfigDialog:
         # # Logs checkbox. (logs dont working anyway)
         # self.enable_logs = IntVar()
         # Checkbutton(self.master, text='Enable logs', variable=self.enable_logs).grid(row=8, column=0, columnspan=2, sticky=W)
-<<<<<<< HEAD
         
         self.master.protocol('WM_DELETE_WINDOW', self.ok)
         self.master.mainloop()
         
     def addStrategy(self):
         self.stratList.insert(END, self.selected.get())
-=======
-        # self.master.protocol('WM_DELETE_WINDOW', self.ok)
-        # self.master.mainloop()
-        
-    def addStrategy(self):
-        self.list.insert(END, self.selected.get())
->>>>>>> 119308d9bc1d2f85561de24f5e29dbc0d593ec6a
         
     def changeDescription(self, *nothing, **nowhere):
         names = [o.name + ' ' + o.version for o in self.index]
