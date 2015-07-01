@@ -47,7 +47,10 @@ if __name__ == '__main__':
         ready_log_name = (log_name if args.logs_flag else None)
         themeStr = args.theme
         teams = set()
-        strategies = Loader().loadStrategies(args.strategies)
+        if args.strategies:
+            strategies = Loader().loadStrategies(args.strategies)
+        else:
+            strategies = []
     for i in range(len(strategies)):
         teams.update({Team(AntClass=strategies[i].AntClass, BaseClass=strategies[i].BaseClass, team_id=i + 1)})            
     AntWarsGame = gameController(size=size,
