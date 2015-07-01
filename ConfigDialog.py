@@ -2,7 +2,7 @@ import os
 from Tkinter import *
 from loader import Strategy, Loader
 
-class ChooseDialog:
+class ConfigDialog:
     def __init__(self, result, noindex=[]):
         self.result = result
         self.lo = Loader()

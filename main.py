@@ -5,7 +5,7 @@ from datetime import datetime
 
 from World import Team
 from gameController import gameController
-from ChooseDialog import ChooseDialog
+from ConfigDialog import ConfigDialog
 from loader import Strategy
 
 if __name__ == '__main__':
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     # team2 = Team(AntClass=BasicAnt, BaseClass=BasicBase, team_id=2)
     teams = set()
     strategies = []
-    ChooseDialog(strategies)
+    ConfigDialog(strategies)
     for i in range(len(strategies)):
         teams.update({Team(AntClass=strategies[i].AntClass, BaseClass=strategies[i].BaseClass, team_id=i + 1)})
     
