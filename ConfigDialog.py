@@ -3,7 +3,7 @@ from Tkinter import *
 from loader import Strategy, Loader
 
 class ConfigDialog:
-    def __init__(self, result, config):
+    def __init__(self, result, config, defaults):
         self.result = result
         self.config = config
         self.lo = Loader()
@@ -11,7 +11,8 @@ class ConfigDialog:
         
         Label(self.master, text='Choose strategies (just close this window when ready):').grid(row=0, columnspan=2)
         # Create list of strategies.
-        self.index = [self.lo.loadStrategy(filename[:-3]) for filename in os.listdir('strategies')]
+        stratFiles = os.listdir('strategies')
+        self.index = [self.lo.loadStrategy(filename[:-3]) for filename in stratFiles]
         # And it human-readable names.
         names = [o.name + ' ' + o.version for o in self.index]
         
@@ -28,7 +29,11 @@ class ConfigDialog:
         
         # "Add" button for strategies.
         Button(self.master, text='Add =>', command=self.addStrategy).grid(row=3)
+        
+        # Selected strategies list.
         self.stratList = Listbox(self.master)
+        for name in defaults['strategies']:
+            self.stratList.insert(END, name + ' ' + self.lo.loadStrategy(name).version)
         self.stratList.grid(row=1, column=1, rowspan=2, sticky=NS)
         
         # "Delete" button for strategies.
@@ -37,13 +42,14 @@ class ConfigDialog:
         # Themes combo box.
         Label(self.master, text='Choose theme:').grid(row=4, column=0, sticky=W)
         self.theme = StringVar()
+        self.theme.set(defaults['theme'])
         OptionMenu(self.master, self.theme, *[filename[:-3] for filename in os.listdir('themes')]).grid(row=4, column=1, sticky=EW)
         
         # Width spinbox.
         Label(self.master, text='Field width:').grid(row=5, column=0, sticky=W)
         self.width = Spinbox(self.master, from_=10, to=300)
         self.width.delete(0, END)
-        self.width.insert(0, 50)
+        self.width.insert(0, defaults['width'])
         self.width.grid(row=5, column=1, sticky=EW)
         
         # Height spinbox.
@@ -51,17 +57,18 @@ class ConfigDialog:
         self.height = Spinbox(self.master, from_=10, to=300)
         self.height.grid(row=6, column=1, sticky=EW)
         self.height.delete(0, END)
-        self.height.insert(0, 21)
+        self.height.insert(0, defaults['height'])
         
         # Delay spinbox.
         Label(self.master, text='Step delay (in ms):').grid(row=7, column=0, sticky=W)
         self.delay = Spinbox(self.master, from_=100, to=5000)
         self.delay.delete(0, END)
-        self.delay.insert(0, 500)
+        self.delay.insert(0, defaults['delay'])
         self.delay.grid(row=7, column=1, sticky=EW)  
         
         # # Logs checkbox. (logs dont working anyway)
         # self.enable_logs = IntVar()
+        # self.enable_logs.set(int(defaults['enable_logs']))
         # Checkbutton(self.master, text='Enable logs', variable=self.enable_logs).grid(row=8, column=0, columnspan=2, sticky=W)
         
         self.master.protocol('WM_DELETE_WINDOW', self.ok)

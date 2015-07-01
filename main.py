@@ -28,7 +28,15 @@ if __name__ == '__main__':
         teams = set() 
         strategies = []
         config = dict()
-        ConfigDialog(strategies, config)
+        defaults = {\
+            'width': int(args.size.split()[0]),\
+            'height': int(args.size.split()[1]),\
+            'delay': args.delay,\
+            'enable_logs': args.logs_flag,\
+            'theme': args.theme,\
+            'strategies': (args.strategies if args.strategies else [])\
+        }
+        ConfigDialog(strategies, config, defaults)
         size = (config['width'], config['height'])
         delay = config['delay']
         ready_log_name = (log_name if config['enable_logs'] else None)
