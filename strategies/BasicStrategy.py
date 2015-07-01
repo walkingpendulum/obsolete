@@ -141,3 +141,9 @@ class BasicHarvester(BasicAnt):
 
         return compute_next_move_for_ant_w_food(self) if self.base.API.get_food_load(self) > 0 \
                     else compute_next_move_for_ant_wo_food(self)
+
+MANIFEST = {
+    'description': 'Default dumb strategy.',
+    'BaseClass': BasicBase,
+    'AntClass': BasicAnt
+}
