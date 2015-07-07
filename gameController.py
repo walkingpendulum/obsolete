@@ -64,6 +64,15 @@ class gameController:
                                      (self.world.size[1] + 1) * self.theme['CELL_SIZE'],
                                      fill=self.theme['EMPTY_CELL_COLOR'],
                                      )
+        if self.theme['EMPTY_OUTLINE']:
+            for i in range(0, self.world.size[0]):
+                for j in range(0, self.world.size[1]):
+                    self.canvas.create_rectangle(i * self.theme['CELL_SIZE'],\
+                                                 j * self.theme['CELL_SIZE'],\
+                                                 (i + 1) * self.theme['CELL_SIZE'],\
+                                                 (j + 1) * self.theme['CELL_SIZE'],\
+                                                 fill='',
+                                                 outline=self.theme['OUTLINE_COLOR'])
         self.canvas.pack(ipadx=0, ipady=0)
         self.world.Init(teams)
         self.teamColors = [getNewColor() for _ in sorted(self.world.teams_by_base, key=lambda base: base.team_id)]
