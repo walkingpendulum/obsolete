@@ -37,7 +37,7 @@ class World(object):
         self.obj_by_coord = dict()
         self.teams_by_base = dict()
         self.cargo_by_ant = dict()   # по муравью дает его загрузку (едой)
-        self.state_delta_by_obj = dict()     # хранит инорфмацию об изменении местоположения/удалении
+        self.repaint_method_by_obj = dict()     # хранит инорфмацию об изменении местоположения/удалении
 
         for coord in product(*map(range, self.size)):
             if 0 <= uniform(0, 1) < type(self).food_prob:
@@ -67,17 +67,37 @@ class World(object):
     def set_obj(self, obj, coord):
         self.coord_by_obj[obj] = coord
         self.obj_by_coord[coord] = obj
-        self.state_delta_by_obj[obj] = 'created'
+        self.repaint_method_by_obj[obj] = 'createCell'
 
     def move_obj(self, obj, new_coord):
+        dst_obj = self.obj_by_coord[new_coord]
+        if dst_obj:
+            self.del_obj(dst_obj)
         self.obj_by_coord[self.coord_by_obj[obj]] = None
-        self.set_obj(obj, new_coord)
-        self.state_delta_by_obj[obj] = 'moved'
+        self.coord_by_obj[obj] = new_coord
+        self.obj_by_coord[new_coord] = obj
+        '''
+        бывает, что база создала муравья, а муравей потом переместился в другую клетку.
+        между моментом создания и моментом перемещения не было перерисовки, поэтому будем считать,
+        что муравья создали в итоговой клетке
+        '''
+        if self.repaint_method_by_obj.get(obj, None) == 'createCell':
+            pass
+        else:
+            self.repaint_method_by_obj[obj] = 'moveCell'
 
     def del_obj(self, obj):
         self.obj_by_coord[self.coord_by_obj[obj]] = None
         del self.coord_by_obj[obj]
-        self.state_delta_by_obj[obj] = 'deleted'
+        '''
+        бывает, что еду на пустое место сбросил один муравей, тут же подобрал другой,
+        и перерисовки между этими ходами еще не было. в таком случае с точки зрения перерисовки
+        сброса вообще не было
+        '''
+        if self.repaint_method_by_obj.get(obj, None) == 'createCell':
+            del self.repaint_method_by_obj[obj]
+        else:
+            self.repaint_method_by_obj[obj] = 'deleteCell'
 
     def hit(self, dst_coord, ant):
         enemy = self.obj_by_coord.get(dst_coord, None)
@@ -151,6 +171,7 @@ class World(object):
 
     def advance(self):
         '''Ход планеты, он же игровой день'''
+        self.repaint_method_by_obj.clear()
         for team in self.teams_by_base.itervalues():
             team.base.advance()
             for ant in team.ants_set:
