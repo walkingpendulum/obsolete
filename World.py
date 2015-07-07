@@ -37,12 +37,15 @@ class World(object):
         self.obj_by_coord = dict()
         self.teams_by_base = dict()
         self.cargo_by_ant = dict()   # по муравью дает его загрузку (едой)
+        self.repaint_method_by_obj = dict()     # хранит инорфмацию об изменении местоположения/удалении
 
         for coord in product(*map(range, self.size)):
-            self.obj_by_coord[coord] = None
-            if 0 <= uniform(0,1) < type(self).food_prob:
-                self.obj_by_coord[coord] = Food(randint(type(self).food_min_start_quantity_in_cell,
-                                                        type(self).food_max_start_quantity_in_cell))
+            if 0 <= uniform(0, 1) < type(self).food_prob:
+                quantity = randint(type(self).food_min_start_quantity_in_cell,
+                                   type(self).food_max_start_quantity_in_cell)
+                self.set_obj(obj=Food(quantity), coord=coord)
+            else:
+                self.obj_by_coord[coord] = None
 
     def add_team(self, team):
         team.base = team.BaseClass()
@@ -59,15 +62,42 @@ class World(object):
             API_for_setup = API(world=self)
             API_for_setup.Init(base)
             base.Init(API=API_for_setup)
-            self.set_obj_coord_relation(obj=base, coord=coord)
+            self.set_obj(obj=base, coord=coord)
 
-    def set_obj_coord_relation(self, obj, coord):
+    def set_obj(self, obj, coord):
         self.coord_by_obj[obj] = coord
         self.obj_by_coord[coord] = obj
+        self.repaint_method_by_obj[obj] = 'createCell'
+
+    def move_obj(self, obj, new_coord):
+        dst_obj = self.obj_by_coord[new_coord]
+        if dst_obj:
+            self.del_obj(dst_obj)
+        self.obj_by_coord[self.coord_by_obj[obj]] = None
+        self.coord_by_obj[obj] = new_coord
+        self.obj_by_coord[new_coord] = obj
+        '''
+        бывает, что база создала муравья, а муравей потом переместился в другую клетку.
+        между моментом создания и моментом перемещения не было перерисовки, поэтому будем считать,
+        что муравья создали в итоговой клетке
+        '''
+        if self.repaint_method_by_obj.get(obj, None) == 'createCell':
+            pass
+        else:
+            self.repaint_method_by_obj[obj] = 'moveCell'
 
     def del_obj(self, obj):
         self.obj_by_coord[self.coord_by_obj[obj]] = None
         del self.coord_by_obj[obj]
+        '''
+        бывает, что еду на пустое место сбросил один муравей, тут же подобрал другой,
+        и перерисовки между этими ходами еще не было. в таком случае с точки зрения перерисовки
+        сброса вообще не было
+        '''
+        if self.repaint_method_by_obj.get(obj, None) == 'createCell':
+            del self.repaint_method_by_obj[obj]
+        else:
+            self.repaint_method_by_obj[obj] = 'deleteCell'
 
     def hit(self, dst_coord, ant):
         enemy = self.obj_by_coord.get(dst_coord, None)
@@ -92,32 +122,28 @@ class World(object):
                 if not self.cargo_by_ant.get(obj, 0):
                     self.cargo_by_ant[obj] = 1
             elif dst_coord in self.obj_by_coord:
-                self.obj_by_coord[dst_coord] = Food(1)
+                food = Food(1)
+                self.set_obj(obj=food, coord=dst_coord)
 
     def take_food(self, dst_coord, ant):
         obj = self.obj_by_coord.get(dst_coord, None)
         if isinstance(obj, Food):
             self.cargo_by_ant[ant] = 1
             if obj.food == 1:
-                self.obj_by_coord[dst_coord] = None
+                self.del_obj(obj)
             elif obj.food > 1:
                 obj.food -= 1
 
     def move(self, dst_coord, ant):
-        old_coord = self.coord_by_obj[ant]
         # todo: может быть стоит не пропускать ход в world.move(), если перемещение некорректное, а бросать исключение?
         if dst_coord not in self.obj_by_coord:
             return
-        elif old_coord == dst_coord:
+        elif self.coord_by_obj[ant] == dst_coord:
             return
-        elif isinstance(self.obj_by_coord[dst_coord], Ant):
-            return
-        elif isinstance(self.obj_by_coord[dst_coord], Base):
+        elif isinstance(self.obj_by_coord[dst_coord], (Ant, Base)):
             return
         else:
-            old_coord = self.coord_by_obj[ant]
-            self.obj_by_coord[old_coord] = None
-            self.set_obj_coord_relation(obj=ant, coord=dst_coord)
+            self.move_obj(obj=ant, new_coord=dst_coord)
 
     def spawn(self, team, AntClass=type(None)):
         '''Обработка события "создать муравья". Возвращает True, если удалось, False иначе '''
@@ -135,7 +161,7 @@ class World(object):
                                and self.obj_by_coord.get((x_base + dx, y_base + dy), None) is None])
                 ant = AntClass(base=team.base)
                 team.ants_set.update({ant})
-                self.set_obj_coord_relation(obj=ant, coord=coord)
+                self.set_obj(obj=ant, coord=coord)
                 team.food -= type(self).cost_of_ant
                 return True
             except IndexError:
@@ -145,6 +171,7 @@ class World(object):
 
     def advance(self):
         '''Ход планеты, он же игровой день'''
+        self.repaint_method_by_obj.clear()
         for team in self.teams_by_base.itervalues():
             team.base.advance()
             for ant in team.ants_set:
@@ -168,8 +195,8 @@ class World(object):
             for x in range(self.size[0]):
                 figure = self.obj_by_coord[x, y]
                 label = ' ' if figure == None \
-                    else Food.label if isinstance(figure, Food) \
-                    else Base.label if isinstance(figure, Base) \
+                    else 'f' if isinstance(figure, Food) \
+                    else 'B' if isinstance(figure, Base) \
                     else str(figure.base.team_id)
                 Buffer.append(label)
             Buffer.append('\n')
