@@ -52,7 +52,7 @@ if __name__ == '__main__':
         else:
             strategies = []
     for i in range(len(strategies)):
-        teams.update({Team(AntClass=strategies[i].AntClass, BaseClass=strategies[i].BaseClass, team_id=i + 1)})            
+        teams.update({Team(AntClass=strategies[i].AntClass, BaseClass=strategies[i].BaseClass, team_id=i + 1, team_name=strategies[i].name)})
     AntWarsGame = gameController(size=size,
                                  delay=delay,
                                  log_name=ready_log_name,

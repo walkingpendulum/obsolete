@@ -13,10 +13,11 @@ class Food(object):
 
 class Team(object):
     '''Обертка вокруг набора данных, относящихся к одной из команд'''
-    def __init__(self, AntClass, BaseClass, team_id):
+    def __init__(self, AntClass, BaseClass, team_id, team_name=''):
         self.AntClass = AntClass
         self.BaseClass = BaseClass
         self.team_id = team_id
+        self.team_name = team_name
         self.food = 0
         self.base = None
         self.ants_set = set()
@@ -205,8 +206,9 @@ class World(object):
         return "".join(Buffer)
 
     def getTeamStatList(self):
-        return ['Team %d: food %d, ants %d' %
+        return ['Team %d%s: food %d, ants %d' %
                 (base.team_id,
+                 (' (%s)' % self.teams_by_base[base].team_name) if self.teams_by_base[base].team_name != '' else '',
                  self.teams_by_base[base].food,
                  len(self.teams_by_base[base].ants_set)
                 ) for base in sorted(self.teams_by_base, key=lambda base: base.team_id)]
