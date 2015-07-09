@@ -6,7 +6,7 @@ from World import Food, World
 from Base import Base
 from Ant import Ant
 from random import randint
-from itertools import izip
+from itertools import izip, product
 from functools import partial
 
 class gameController:
@@ -27,6 +27,7 @@ class gameController:
         self.statStringVars = []
         self.master = Tk()
         self.figure_by_obj = dict()
+        self.winner = None
         self.canvas = Canvas(self.master,
                              width=size[0] * self.theme['CELL_SIZE'],
                              height=size[1] * self.theme['CELL_SIZE'],
@@ -65,14 +66,14 @@ class gameController:
                                      fill=self.theme['EMPTY_CELL_COLOR'],
                                      )
         if self.theme['EMPTY_OUTLINE']:
-            for i in range(0, self.world.size[0]):
-                for j in range(0, self.world.size[1]):
-                    self.canvas.create_rectangle(i * self.theme['CELL_SIZE'],\
-                                                 j * self.theme['CELL_SIZE'],\
-                                                 (i + 1) * self.theme['CELL_SIZE'],\
-                                                 (j + 1) * self.theme['CELL_SIZE'],\
-                                                 fill='',
-                                                 outline=self.theme['OUTLINE_COLOR'])
+            for x, y in product(map(range, self.world.size)):
+                self.canvas.create_rectangle(x * self.theme['CELL_SIZE'],
+                                             y * self.theme['CELL_SIZE'],
+                                             (x + 1) * self.theme['CELL_SIZE'],
+                                             (y + 1) * self.theme['CELL_SIZE'],
+                                             fill='',
+                                             outline=self.theme['OUTLINE_COLOR']
+                                             )
         self.canvas.pack(ipadx=0, ipady=0)
         self.world.Init(teams)
         self.teamColors = [getNewColor() for _ in sorted(self.world.teams_by_base, key=lambda base: base.team_id)]
@@ -86,7 +87,19 @@ class gameController:
         for obj, method in self.world.repaint_method_by_obj.items():
             getattr(self, method)(obj)
 
-        for stringVar, line in izip(self.statStringVars, self.world.getTeamStatList()):
+        statList = self.world.getTeamStatList()
+        if len(self.world.teams_by_base) == 0:
+            self.master.destroy()
+            self.advance = self.stopGame()
+        elif len(self.world.teams_by_base) == 1:
+            self.winner = next(self.world.teams_by_base.itervalues())
+        elif sum(True for tmp in map(lambda s: s.split(' '), statList) if
+               tmp[-1] != '0'   # ants
+               or int(tmp[-3][:-1]) >= type(self.world).cost_of_ant     # food
+               ) < 2:
+            self.winner = next(team for team in self.world.teams_by_base.itervalues() if team.ants_set)
+
+        for stringVar, line in izip(self.statStringVars, statList):
             stringVar.set(line)
 
     def deleteCell(self, obj):
@@ -125,10 +138,21 @@ class gameController:
         self.canvas.update_idletasks()
 
     def advance(self):
-        self.world.advance()
-        self.repaint()
+        if self.winner:
+            self.advance = self.stopGame
+        else:
+            self.world.advance()
+            self.repaint()
         self.master.after(self.delay, self.advance)
 
     def launch(self):
         self.master.after(1, self.advance)
         self.master.mainloop()
+
+    def stopGame(self):
+        for stringVar, line in izip(self.statStringVars, self.world.getTeamStatList()):
+            if int(line.split(' ')[1]) != self.winner.team_id:
+                line = ''
+            else:
+                line = 'GAME OVER! ' + line + ' GAME OVER!'
+            stringVar.set(line)
