@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-from datetime import datetime
 
 from World import Team
 from gameController import gameController
 from ConfigDialog import ConfigDialog
-from loader import Strategy, Loader
+from loader import Loader
 
 if __name__ == '__main__':
     # TODO: Return console interface.
@@ -28,13 +27,13 @@ if __name__ == '__main__':
         teams = set() 
         strategies = []
         config = dict()
-        defaults = {\
-            'width': int(args.size.split()[0]),\
-            'height': int(args.size.split()[1]),\
-            'delay': args.delay,\
-            'enable_logs': args.logs_flag,\
-            'theme': args.theme,\
-            'strategies': (args.strategies if args.strategies else [])\
+        defaults = {
+            'width': int(args.size.split()[0]),
+            'height': int(args.size.split()[1]),
+            'delay': args.delay,
+            'enable_logs': args.logs_flag,
+            'theme': args.theme,
+            'strategies': (args.strategies if args.strategies else [])
         }
         ConfigDialog(strategies, config, defaults)
         size = (config['width'], config['height'])
@@ -51,8 +50,11 @@ if __name__ == '__main__':
             strategies = Loader().loadStrategies(args.strategies)
         else:
             strategies = []
-    for i in range(len(strategies)):
-        teams.update({Team(AntClass=strategies[i].AntClass, BaseClass=strategies[i].BaseClass, team_id=i + 1, team_name=strategies[i].name)})
+    for i, strategy in enumerate(strategies):
+        teams.update({Team(AntClass=strategy.AntClass,
+                           BaseClass=strategy.BaseClass,
+                           team_id=i + 1,
+                           team_name=strategy.name)})
     AntWarsGame = gameController(size=size,
                                  delay=delay,
                                  log_name=ready_log_name,
