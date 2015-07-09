@@ -66,7 +66,7 @@ class gameController:
                                      fill=self.theme['EMPTY_CELL_COLOR'],
                                      )
         if self.theme['EMPTY_OUTLINE']:
-            for x, y in product(map(range, self.world.size)):
+            for x, y in product(*map(range, self.world.size)):
                 self.canvas.create_rectangle(x * self.theme['CELL_SIZE'],
                                              y * self.theme['CELL_SIZE'],
                                              (x + 1) * self.theme['CELL_SIZE'],
