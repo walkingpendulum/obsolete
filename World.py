@@ -5,6 +5,7 @@ from random import uniform, randint, sample, choice
 from Ant import Ant
 from Base import Base
 from API import API
+import states
 
 class Food(object):
     '''Обертка для еды'''
@@ -179,6 +180,8 @@ class World(object):
                 dst_coord, move = ant.move()
                 # todo: вставить проверку на то, что муравей не прыгнул дальше одной клетки
                 getattr(self, move)(dst_coord, ant)
+        if states.DEBUG:
+            import ipdb; ipdb.set_trace()
 
         # срабатывает, если при запуске был задан флаг --logs
         self.dump()
