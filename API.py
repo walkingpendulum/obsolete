@@ -66,7 +66,7 @@ class API(object):
                 return smth.food
             elif isinstance(smth, type(None)):
                 return 0
-            elif (smth, tuple):
+            elif smth, tuple:
                 return self.get_food_load(obj_by_coord(smth))
         else:
             return get_food_by_coord(obj_by_coord(args))

@@ -10,4 +10,4 @@ class Ant(object):
     # метод move муравью не нужен?
     def move(self):
         """Возвращает ход муравья -- кортеж (destination_coord, строка с типом хода)"""
-        return (self.base.API.get_coord(self), 'move')
+        return self.base.API.get_coord(self), 'move'
