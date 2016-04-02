@@ -48,7 +48,7 @@ class API(object):
         if len(coords) == 1:    # дали кортеж (x, y)
             coords = coords[0]
         return type(world.obj_by_coord.get(coords, None))
-    
+
     def get_food_load(self, smth):
         """Возвращает количество еды.
 

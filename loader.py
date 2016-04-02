@@ -13,7 +13,7 @@ class Strategy:
 class Loader:
     def __init__(self):
         pass
-    
+
     def loadStrategy(self, strategyName):
         data = dict()
         if not os.path.isfile('strategies/' + strategyName + '.py'):
@@ -29,6 +29,6 @@ class Loader:
             manifest['version'] = '1.0'
         manifest['name'] = strategyName
         return Strategy(**manifest)
-    
+
     def loadStrategies(self, strategyNames):
         return [self.loadStrategy(name) for name in strategyNames]

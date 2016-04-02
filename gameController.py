@@ -54,8 +54,7 @@ class gameController:
                     or isClose(hexToRGB(newColor), (255, 255, 255)) \
                     or isClose(hexToRGB(newColor), (0, 0, 0)) \
                     or isClose(hexToRGB(newColor), (255, 0, 0)) \
-                    or isCloseWithOther(newColor)\
-                    :
+                    or isCloseWithOther(newColor):
                 newColor = ("#%06x" % randint(0, 0xFFFFFF))
             return newColor
 
@@ -96,7 +95,7 @@ class gameController:
         statList = self.world.getTeamStatList()
         if len(self.world.teams_by_base) == 0:
             self.master.destroy()
-            self.advance = self.stopGame()
+            self.advance = self.stopGame
         elif len(self.world.teams_by_base) == 1:
             self.winner = next(self.world.teams_by_base.itervalues())
         elif sum(True for tmp in map(lambda s: s.split(' '), statList) if

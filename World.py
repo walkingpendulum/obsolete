@@ -28,7 +28,7 @@ class World(object):
     cost_of_ant = 5     # стоимость создания одного муравья
     start_food_multiplier = 3   # на сколько муравьев хватит стартовой еды 
     food_prob = 0.3     # вероятность появления еды в клетке при создании планеты
-    #магические константы при рандоме еды для размещения в клетку
+    # магические константы при рандоме еды для размещения в клетку
     food_min_start_quantity_in_cell = 3
     food_max_start_quantity_in_cell = 7
 
@@ -202,7 +202,7 @@ class World(object):
         for y in range(self.size[1]):
             for x in range(self.size[0]):
                 figure = self.obj_by_coord[x, y]
-                label = ' ' if figure == None \
+                label = ' ' if figure is None \
                     else 'f' if isinstance(figure, Food) \
                     else 'B' if isinstance(figure, Base) \
                     else str(figure.base.team_id)

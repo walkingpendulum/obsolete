@@ -25,9 +25,9 @@ if __name__ == '__main__':
                         default='constructor', help='Theme for graphical interface.')
     parser.add_argument('-a', '--algorithm', type=str, dest='strategies', action='append',
                         help='Specifes one strategy. Use few -a to specify few strategies')
-   
+
     args = parser.parse_args()
-    
+
     # # Not working anyway.
     # log_name = datetime.now().strftime("%y-%m-%d-%H-%M-%S")
     log_name = None
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     states.DEBUG = args.debug
 
     if not args.cli:
-        teams = set() 
+        teams = set()
         strategies = []
         config = dict()
         defaults = {
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         size = (config['width'], config['height'])
         delay = config['delay']
         ready_log_name = (log_name if config['enable_logs'] else None)
-        themeStr=config['theme']
+        themeStr = config['theme']
     else:
         size = tuple(map(int, args.size.split()))
         delay = args.delay
