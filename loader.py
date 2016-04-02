@@ -21,7 +21,7 @@ class Loader:
         with open('strategies/' + strategyName + '.py') as strategyFile:
             exec(strategyFile.read(), data)
         manifest = data['MANIFEST']
-        if type(manifest) != type(dict()) or 'BaseClass' not in manifest or 'AntClass' not in manifest:
+        if not isinstance(manifest, dict) or 'BaseClass' not in manifest or 'AntClass' not in manifest:
             raise ValueError('Incorrect strategy specified.')
         if 'description' not in manifest:
             manifest['description'] = '...'

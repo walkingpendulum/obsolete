@@ -150,10 +150,10 @@ class World(object):
         else:
             self.move_obj(obj=ant, new_coord=dst_coord)
 
-    def spawn(self, team, AntClass=type(None)):
+    def spawn(self, team, AntClass=None):
         """Обработка события "создать муравья". Возвращает True, если удалось, False иначе """
 
-        AntClass = team.AntClass if AntClass is type(None) else AntClass
+        AntClass = team.AntClass if AntClass is None else AntClass
         x_base, y_base = self.coord_by_obj[team.base]
 
         # если ресурсов достаточно для создания
