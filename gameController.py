@@ -2,12 +2,14 @@
 
 import os.path
 from Tkinter import *
-from World import Food, World
+from World import World
+from Food import Food
 from Base import Base
 from Ant import Ant
 from random import randint
 from itertools import izip, product
 from functools import partial
+
 
 class gameController:
     def loadTheme(self, themeStr):
@@ -52,8 +54,7 @@ class gameController:
                     or isClose(hexToRGB(newColor), (255, 255, 255)) \
                     or isClose(hexToRGB(newColor), (0, 0, 0)) \
                     or isClose(hexToRGB(newColor), (255, 0, 0)) \
-                    or isCloseWithOther(newColor)\
-                    :
+                    or isCloseWithOther(newColor):
                 newColor = ("#%06x" % randint(0, 0xFFFFFF))
             return newColor
 
@@ -72,14 +73,18 @@ class gameController:
                                              (x + 1) * self.theme['CELL_SIZE'],
                                              (y + 1) * self.theme['CELL_SIZE'],
                                              fill='',
-                                             outline=self.theme['OUTLINE_COLOR']
+                                             outline=self.theme[
+                                                 'OUTLINE_COLOR']
                                              )
         self.canvas.pack(ipadx=0, ipady=0)
         self.world.Init(teams)
-        self.teamColors = [getNewColor() for _ in sorted(self.world.teams_by_base, key=lambda base: base.team_id)]
-        self.statStringVars = [StringVar() for _ in sorted(self.world.teams_by_base, key=lambda base: base.team_id)]
+        self.teamColors = [getNewColor() for _ in sorted(
+            self.world.teams_by_base, key=lambda base: base.team_id)]
+        self.statStringVars = [StringVar() for _ in sorted(
+            self.world.teams_by_base, key=lambda base: base.team_id)]
         for stringVar, color in izip(self.statStringVars, self.teamColors):
-            lbl = Label(self.master, textvariable=stringVar, fg=color, bg=self.theme['BG_COLOR'])
+            lbl = Label(self.master, textvariable=stringVar,
+                        fg=color, bg=self.theme['BG_COLOR'])
             lbl.pack()
         self.repaint()
 
@@ -90,14 +95,15 @@ class gameController:
         statList = self.world.getTeamStatList()
         if len(self.world.teams_by_base) == 0:
             self.master.destroy()
-            self.advance = self.stopGame()
+            self.advance = self.stopGame
         elif len(self.world.teams_by_base) == 1:
             self.winner = next(self.world.teams_by_base.itervalues())
         elif sum(True for tmp in map(lambda s: s.split(' '), statList) if
                tmp[-1] != '0'   # ants
                or int(tmp[-3][:-1]) >= type(self.world).cost_of_ant     # food
                ) < 2:
-            self.winner = next(team for team in self.world.teams_by_base.itervalues() if team.ants_set)
+            self.winner = next(
+                team for team in self.world.teams_by_base.itervalues() if team.ants_set)
 
         for stringVar, line in izip(self.statStringVars, statList):
             stringVar.set(line)
@@ -132,7 +138,8 @@ class gameController:
                                               (x + 1) * self.theme['CELL_SIZE'],
                                               (y + 1) * self.theme['CELL_SIZE'],
                                               fill=color,
-                                              outline=self.theme['OUTLINE_COLOR'],
+                                              outline=self.theme[
+                                                  'OUTLINE_COLOR'],
                                               )
         self.figure_by_obj[obj] = figure
         self.canvas.update_idletasks()
