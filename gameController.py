@@ -63,10 +63,8 @@ class gameController:
         self.master['bg'] = self.theme['BG_COLOR']
         self.canvas.create_rectangle(0,
                                      0,
-                                     (self.world.size[0] + 1) * \
-                                      self.theme['CELL_SIZE'],
-                                     (self.world.size[1] + 1) * \
-                                      self.theme['CELL_SIZE'],
+                                     (self.world.size[0] + 1) * self.theme['CELL_SIZE'],
+                                     (self.world.size[1] + 1) * self.theme['CELL_SIZE'],
                                      fill=self.theme['EMPTY_CELL_COLOR'],
                                      )
         if self.theme['EMPTY_OUTLINE']:
@@ -138,10 +136,8 @@ class gameController:
             color = self.teamColors[obj.base.team_id - 1]
         figure = self.canvas.create_rectangle(x * self.theme['CELL_SIZE'],
                                               y * self.theme['CELL_SIZE'],
-                                              (x + 1) * \
-                                               self.theme['CELL_SIZE'],
-                                              (y + 1) * \
-                                               self.theme['CELL_SIZE'],
+                                              (x + 1) * self.theme['CELL_SIZE'],
+                                              (y + 1) * self.theme['CELL_SIZE'],
                                               fill=color,
                                               outline=self.theme[
                                                   'OUTLINE_COLOR'],
