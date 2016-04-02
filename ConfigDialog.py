@@ -10,10 +10,12 @@ class ConfigDialog:
         self.lo = Loader()
         self.master = Tk()
         
-        Label(self.master, text='Choose strategies (just close this window when ready):').grid(row=0, columnspan=2)
+        Label(self.master, text='Choose strategies (just close this window when ready):').grid(
+            row=0, columnspan=2)
         # Create list of strategies.
         stratFiles = os.listdir('strategies')
-        self.index = [self.lo.loadStrategy(filename[:-3]) for filename in stratFiles]
+        self.index = [self.lo.loadStrategy(
+            filename[:-3]) for filename in stratFiles]
         # And it human-readable names.
         names = [o.name + ' ' + o.version for o in self.index]
         
@@ -29,22 +31,27 @@ class ConfigDialog:
         self.desc.grid(row=2, sticky=NSEW)
         
         # "Add" button for strategies.
-        Button(self.master, text='Add =>', command=self.addStrategy).grid(row=3)
+        Button(self.master, text='Add =>',
+               command=self.addStrategy).grid(row=3)
         
         # Selected strategies list.
         self.stratList = Listbox(self.master)
         for name in defaults['strategies']:
-            self.stratList.insert(END, name + ' ' + self.lo.loadStrategy(name).version)
+            self.stratList.insert(
+                END, name + ' ' + self.lo.loadStrategy(name).version)
         self.stratList.grid(row=1, column=1, rowspan=2, sticky=NS)
         
         # "Delete" button for strategies.
-        Button(self.master, text='Delete', command=lambda lb=self.stratList: lb.delete(ANCHOR)).grid(row=3, column=1)
+        Button(self.master, text='Delete', command=lambda lb=self.stratList: lb.delete(
+            ANCHOR)).grid(row=3, column=1)
         
         # Themes combo box.
-        Label(self.master, text='Choose theme:').grid(row=4, column=0, sticky=W)
+        Label(self.master, text='Choose theme:').grid(
+            row=4, column=0, sticky=W)
         self.theme = StringVar()
         self.theme.set(defaults['theme'])
-        OptionMenu(self.master, self.theme, *[filename[:-3] for filename in os.listdir('themes')]).grid(row=4, column=1, sticky=EW)
+        OptionMenu(self.master, self.theme, *[filename[:-3] for filename in os.listdir(
+            'themes')]).grid(row=4, column=1, sticky=EW)
         
         # Width spinbox.
         Label(self.master, text='Field width:').grid(row=5, column=0, sticky=W)
@@ -54,14 +61,16 @@ class ConfigDialog:
         self.width.grid(row=5, column=1, sticky=EW)
         
         # Height spinbox.
-        Label(self.master, text='Field height:').grid(row=6, column=0, sticky=W)
+        Label(self.master, text='Field height:').grid(
+            row=6, column=0, sticky=W)
         self.height = Spinbox(self.master, from_=10, to=300)
         self.height.grid(row=6, column=1, sticky=EW)
         self.height.delete(0, END)
         self.height.insert(0, defaults['height'])
         
         # Delay spinbox.
-        Label(self.master, text='Step delay (in ms):').grid(row=7, column=0, sticky=W)
+        Label(self.master, text='Step delay (in ms):').grid(
+            row=7, column=0, sticky=W)
         self.delay = Spinbox(self.master, from_=100, to=5000)
         self.delay.delete(0, END)
         self.delay.insert(0, defaults['delay'])
@@ -81,16 +90,21 @@ class ConfigDialog:
     def changeDescription(self, *nothing, **nowhere):
         names = [o.name + ' ' + o.version for o in self.index]
         self.desc.delete('0.0', END)
-        self.desc.insert('0.0', self.index[names.index(self.selected.get())].description)
+        self.desc.insert('0.0', self.index[
+                         names.index(self.selected.get())].description)
 
     def ok(self):
         names = [o.name + ' ' + o.version for o in self.index]
         for name in list(self.stratList.get(0, END)):
             self.result.append(self.index[names.index(name)])
-        self.config['theme'] = (self.theme.get() if self.theme.get() else 'constructor')
-        self.config['width'] = (int(self.width.get()) if self.width.get().isdigit() else 50)
-        self.config['height'] = (int(self.height.get()) if self.height.get().isdigit() else 21)
-        self.config['delay'] = (int(self.delay.get()) if self.delay.get().isdigit() else 500)
+        self.config['theme'] = (
+            self.theme.get() if self.theme.get() else 'constructor')
+        self.config['width'] = (int(self.width.get())
+                                if self.width.get().isdigit() else 50)
+        self.config['height'] = (
+            int(self.height.get()) if self.height.get().isdigit() else 21)
+        self.config['delay'] = (int(self.delay.get())
+                                if self.delay.get().isdigit() else 500)
         
         # # Logs dont working anyway.
         # self.config['enable_logs'] = bool(self.enable_logs.get())

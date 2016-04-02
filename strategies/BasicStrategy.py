@@ -44,10 +44,12 @@ class BasicAnt(Ant):
     def nhood(self, radius):
         """Возвращает окрестность радиуса radius"""
         API = self.base.API
-        x0, y0, x_max, y_max = API.get_coord_by_obj(self) + API.get_size_of_world()
+        x0, y0, x_max, y_max = API.get_coord_by_obj(
+            self) + API.get_size_of_world()
         type_by = API.get_type_by_coord
         return [(x, y, type_by(x, y)) for x, y in
-                product(range(-radius + x0, radius + 1 + x0), range(-radius + y0, radius + 1 + y0))
+                product(range(-radius + x0, radius + 1 + x0),
+                        range(-radius + y0, radius + 1 + y0))
                 if 0 <= x < x_max and 0 <= y < y_max]
 
     def move(self):
@@ -62,7 +64,8 @@ class BasicRanger(BasicAnt):
     def set_next_cell_for_patrol(self):
         x_max, y_max = self.base.API.get_size_of_world()
         while True:
-            self.next_cell_for_patrol = randint(0, x_max - 1), randint(0, y_max - 1)
+            self.next_cell_for_patrol = randint(
+                0, x_max - 1), randint(0, y_max - 1)
             if not issubclass(self.base.API.get_type_by_coord(self.next_cell_for_patrol), Base):
                 break
 
@@ -70,10 +73,12 @@ class BasicRanger(BasicAnt):
         return [(x, y) for x, y, _ in self.nhood(radius) if self.base.API.is_enemy_by_coord(x, y)]
 
     def patrol(self):
-        nhood = [(x, y) for x, y, t in self.nhood(1) if not issubclass(t, Base)]
+        nhood = [(x, y)
+                  for x, y, t in self.nhood(1) if not issubclass(t, Base)]
 
         x, y = self.next_cell_for_patrol
-        new_coord = min(nhood, key=lambda coord: dist(old_coord=(x, y), new_coord=coord))
+        new_coord = min(nhood, key=lambda coord: dist(
+            old_coord=(x, y), new_coord=coord))
         if issubclass(self.base.API.get_type_by_coord(new_coord), Ant):
             new_coord = choice([(x, y) for x, y, _ in self.nhood(1)])
         return new_coord
@@ -124,13 +129,16 @@ class BasicHarvester(BasicAnt):
         def compute_next_move_for_ant_w_food(ant):
             nhood = self.nhood(1)
             API = self.base.API
-            base_coord, ant_coord = API.get_coord_by_obj(self.base), API.get_coord_by_obj(self)
+            base_coord, ant_coord = API.get_coord_by_obj(
+                self.base), API.get_coord_by_obj(self)
             if base_coord in [(x, y) for x, y, _ in nhood]:
                 return (base_coord, 'drop_food')
 
-            nhood = [(x, y) for x, y, t in nhood if not issubclass(t, Base) and not issubclass(t, Ant)]
+            nhood = [(x, y) for x, y, t in nhood if not issubclass(
+                t, Base) and not issubclass(t, Ant)]
             try:
-                coord_new = min(nhood, key=lambda coord: dist(coord, base_coord))
+                coord_new = min(
+                    nhood, key=lambda coord: dist(coord, base_coord))
             except IndexError:
                 coord_new = ant_coord
 

@@ -32,7 +32,8 @@ class World(object):
     cost_of_ant = 5     # стоимость создания одного муравья
     start_food_multiplier = 3   # на сколько муравьев хватит стартовой еды 
     food_prob = 0.3     # вероятность появления еды в клетке при создании планеты
-    food_min_start_quantity_in_cell = 3     #магические константы при рандоме еды для размещения в клетку
+    #магические константы при рандоме еды для размещения в клетку
+    food_min_start_quantity_in_cell = 3
     food_max_start_quantity_in_cell = 7
 
     def __init__(self, size, log_name):
@@ -42,7 +43,8 @@ class World(object):
         self.obj_by_coord = dict()
         self.teams_by_base = dict()
         self.cargo_by_ant = dict()   # по муравью дает его загрузку (едой)
-        self.repaint_method_by_obj = dict()     # хранит инорфмацию об изменении местоположения/удалении
+        # хранит инорфмацию об изменении местоположения/удалении
+        self.repaint_method_by_obj = dict()
 
         for coord in product(*map(range, self.size)):
             if 0 <= uniform(0, 1) < type(self).food_prob:
@@ -111,7 +113,8 @@ class World(object):
         else:
             if 0 <= uniform(0, 1) <= type(self).hit_prob:
                 # удаляем муравья отовсюду
-                self.teams_by_base[enemy.base].ants_set.difference_update({enemy})
+                self.teams_by_base[enemy.base].ants_set.difference_update({
+                                                                          enemy})
                 self.del_obj(enemy)
                 self.cargo_by_ant.pop(enemy, None)
 
@@ -140,7 +143,8 @@ class World(object):
                 obj.food -= 1
 
     def move(self, dst_coord, ant):
-        # todo: может быть стоит не пропускать ход в world.move(), если перемещение некорректное, а бросать исключение?
+        # todo: может быть стоит не пропускать ход в world.move(), если
+        # перемещение некорректное, а бросать исключение?
         if dst_coord not in self.obj_by_coord:
             return
         elif self.coord_by_obj[ant] == dst_coord:
@@ -181,7 +185,8 @@ class World(object):
             team.base.advance()
             for ant in team.ants_set:
                 dst_coord, move = ant.move()
-                # todo: вставить проверку на то, что муравей не прыгнул дальше одной клетки
+                # todo: вставить проверку на то, что муравей не прыгнул дальше
+                # одной клетки
                 getattr(self, move)(dst_coord, ant)
         if states.DEBUG:
             import ipdb; ipdb.set_trace()
@@ -214,7 +219,8 @@ class World(object):
     def getTeamStatList(self):
         return ['Team %d%s: food %d, ants %d' %
                 (base.team_id,
-                 (' (%s)' % self.teams_by_base[base].team_name) if self.teams_by_base[base].team_name != '' else '',
+                 (' (%s)' % self.teams_by_base[base].team_name) if self.teams_by_base[
+                  base].team_name != '' else '',
                  self.teams_by_base[base].food,
                  len(self.teams_by_base[base].ants_set)
                 ) for base in sorted(self.teams_by_base, key=lambda base: base.team_id)]
