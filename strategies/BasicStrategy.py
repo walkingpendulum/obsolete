@@ -7,7 +7,7 @@ from random import choice, randint
 from itertools import product
 from Base import Base
 from Ant import Ant
-from World import Food
+from Food import Food
 
 
 def dist(old_coord, new_coord):

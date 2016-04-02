@@ -2,16 +2,12 @@
 
 from itertools import product
 from random import uniform, randint, sample, choice
+
+import states
+from API import API
 from Ant import Ant
 from Base import Base
-from API import API
-import states
-
-
-class Food(object):
-    """Обертка для еды"""
-    def __init__(self, food):
-        self.food = food
+from Food import Food
 
 
 class Team(object):

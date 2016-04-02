@@ -2,7 +2,8 @@
 
 import os.path
 from Tkinter import *
-from World import Food, World
+from World import World
+from Food import Food
 from Base import Base
 from Ant import Ant
 from random import randint
