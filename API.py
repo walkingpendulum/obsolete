@@ -2,6 +2,7 @@
 from Ant import Ant
 from Base import Base
 
+
 class API(object):
     world = None
 
@@ -13,45 +14,45 @@ class API(object):
         self.team = type(self).world.teams_by_base[base]
 
     def get_team_id_by_base(self, base):
-        '''Возвращает идентификатор команды'''
+        """Возвращает идентификатор команды"""
         world = type(self).world
         return world.teams_by_base[base].team_id
 
     def ask_for_spawn(self, AntClass=type(None)):
-        '''Пытается создать нового муравья'''
+        """Пытается создать нового муравья"""
         world = type(self).world
         return world.spawn(self.team, AntClass)
 
     def get_list_of_ants(self):
-        '''Возвращает копию списка живых муравьев вашей команды'''
+        """Возвращает копию списка живых муравьев вашей команды"""
         return list(self.team.ants_set)
 
     def get_size_of_world(self):
-        '''Возвращает кортеж (x_size, y_size)'''
+        """Возвращает кортеж (x_size, y_size)"""
         return type(self).world.size
 
     def get_cost_of_ant_spawn(self):
-        '''Возвращает стоимость создания нового муравья'''
+        """Возвращает стоимость создания нового муравья"""
         world = type(self).world
         return world.cost_of_ant
 
     def get_coord_by_obj(self, obj):
-        '''Возвращает кортеж координат заданного объекта'''
+        """Возвращает кортеж координат заданного объекта"""
         world = type(self).world
         return world.coord_by_obj.get(obj, None)
 
     def get_type_by_coord(self, *coords):
-        '''Возвращает тип объекта, находящегося по заданным координатам'''
+        """Возвращает тип объекта, находящегося по заданным координатам"""
         world = type(self).world
         if len(coords) == 1:    # дали кортеж (x, y)
             coords = coords[0]
         return type(world.obj_by_coord.get(coords, None))
     
     def get_food_load(self, *args):
-        '''Возвращает количество еды.
+        """Возвращает количество еды.
 
         Если передается объект, то он должен быть экземпляром Ant, Base или иметь тип type(None).
-        Иначе это должны быть координаты -- либо два аргумента, либо кортеж (x, y) '''
+        Иначе это должны быть координаты -- либо два аргумента, либо кортеж (x, y) """
         world = type(self).world
         obj_by_coord = lambda coord: world.obj_by_coord.get(coord, None)
 

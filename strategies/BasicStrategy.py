@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
-'''
+"""
     ant.move() -> (destination_coord, move)
     moves: 'hit', 'move', 'take_food', 'drop_food'
-'''
+"""
 from random import choice, randint
 from itertools import product
 from Base import Base
 from Ant import Ant
 from World import Food
 
+
 def dist(old_coord, new_coord):
     return max(abs(old_coord[0] - new_coord[0]), abs(old_coord[1] - new_coord[1]))
+
 
 class BasicBase(Base):
     max_harvester_quantity = 7
@@ -37,9 +39,10 @@ class BasicBase(Base):
             x, y = self.API.get_coord(ant)
             return choice([(a, b) for a in range(x-1, x+2) for b in range(y-1, y+2)])
 
+
 class BasicAnt(Ant):
     def nhood(self, radius):
-        '''Возвращает окрестность радиуса radius'''
+        """Возвращает окрестность радиуса radius"""
         API = self.base.API
         x0, y0, x_max, y_max = API.get_coord_by_obj(self) + API.get_size_of_world()
         type_by = API.get_type_by_coord
@@ -96,6 +99,7 @@ class BasicRanger(BasicAnt):
                 self.set_next_cell_for_patrol()
             new_coord = self.patrol()
             return (new_coord, 'move')
+
 
 class BasicHarvester(BasicAnt):
     max_food_time = 10

@@ -9,6 +9,7 @@ from random import randint
 from itertools import izip, product
 from functools import partial
 
+
 class gameController:
     def loadTheme(self, themeStr):
         if not os.path.isfile('themes/' + themeStr + '.py'):

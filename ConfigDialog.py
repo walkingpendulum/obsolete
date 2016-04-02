@@ -2,6 +2,7 @@ import os
 from Tkinter import *
 from loader import Strategy, Loader
 
+
 class ConfigDialog:
     def __init__(self, result, config, defaults):
         self.result = result

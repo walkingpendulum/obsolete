@@ -1,5 +1,6 @@
 import os.path
 
+
 class Strategy:
     def __init__(self, name, description, version, BaseClass, AntClass):
         self.name = name
@@ -7,6 +8,7 @@ class Strategy:
         self.version = version
         self.BaseClass = BaseClass
         self.AntClass = AntClass
+
 
 class Loader:
     def __init__(self):

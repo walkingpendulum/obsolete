@@ -7,13 +7,15 @@ from Base import Base
 from API import API
 import states
 
+
 class Food(object):
-    '''Обертка для еды'''
+    """Обертка для еды"""
     def __init__(self, food):
         self.food = food
 
+
 class Team(object):
-    '''Обертка вокруг набора данных, относящихся к одной из команд'''
+    """Обертка вокруг набора данных, относящихся к одной из команд"""
     def __init__(self, AntClass, BaseClass, team_id, team_name=''):
         self.AntClass = AntClass
         self.BaseClass = BaseClass
@@ -23,8 +25,9 @@ class Team(object):
         self.base = None
         self.ants_set = set()
 
+
 class World(object):
-    '''Игровой мир: игровое поле, обработка ходов команд, перемещение муравьев'''
+    """Игровой мир: игровое поле, обработка ходов команд, перемещение муравьев"""
     hit_prob = 0.9      # вероятность убить муравья при ударе
     cost_of_ant = 5     # стоимость создания одного муравья
     start_food_multiplier = 3   # на сколько муравьев хватит стартовой еды 
@@ -148,7 +151,7 @@ class World(object):
             self.move_obj(obj=ant, new_coord=dst_coord)
 
     def spawn(self, team, AntClass=type(None)):
-        '''Обработка события "создать муравья". Возвращает True, если удалось, False иначе '''
+        """Обработка события "создать муравья". Возвращает True, если удалось, False иначе """
 
         AntClass = team.AntClass if AntClass is type(None) else AntClass
         x_base, y_base = self.coord_by_obj[team.base]
@@ -172,7 +175,7 @@ class World(object):
             return False
 
     def advance(self):
-        '''Ход планеты, он же игровой день'''
+        """Ход планеты, он же игровой день"""
         self.repaint_method_by_obj.clear()
         for team in self.teams_by_base.itervalues():
             team.base.advance()
@@ -187,7 +190,7 @@ class World(object):
         self.dump()
 
     def dump(self):
-        ''' Сбрасывает текущее состояние поля str(world) в файл filename.'''
+        """ Сбрасывает текущее состояние поля str(world) в файл filename."""
         # если при запуске флаг "--logs" не был указан, то self.log_name == None
         if self.log_name:
             with open(self.log_name, mode='a') as f:
