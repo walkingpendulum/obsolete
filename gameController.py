@@ -9,20 +9,19 @@ from Ant import Ant
 from random import randint
 from itertools import izip, product
 from functools import partial
+import yaml
 
 
 class gameController:
-    def loadTheme(self, themeStr):
-        if not os.path.isfile('themes/' + themeStr + '.py'):
-            raise ValueError('Incorrect theme specified.')
-        with open('themes/' + themeStr + '.py') as themeFile:
-            exec(themeFile.read())
-        if not hasattr(self, 'theme'):
-            raise ValueError('Smth goes wrong, theme loading crashed')
+
+    @staticmethod
+    def loadTheme(themeStr):
+        with open('themes/' + themeStr + '.yml') as themeFile:
+            return yaml.load(themeFile)
 
     def __init__(self, size, delay, log_name, themeStr):
         # todo: написать спецификацию для loadTheme() и файлов с темами
-        self.loadTheme(themeStr)
+        self.theme = self.loadTheme(themeStr)
         self.world = World(size, log_name)
         self.delay = delay
         self.teamColors = []

@@ -1,5 +1,5 @@
 import os.path
-
+import yaml
 
 class Strategy:
     def __init__(self, name, description, version, BaseClass, AntClass):
