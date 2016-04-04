@@ -13,15 +13,9 @@ import yaml
 
 
 class gameController:
-
-    @staticmethod
-    def loadTheme(themeStr):
-        with open('themes/' + themeStr + '.yml') as themeFile:
-            return yaml.load(themeFile)
-
     def __init__(self, size, delay, log_name, themeStr):
-        # todo: написать спецификацию для loadTheme() и файлов с темами
-        self.theme = self.loadTheme(themeStr)
+        with open(themeStr) as f:
+            self.theme = yaml.load(f)
         self.world = World(size, log_name)
         self.delay = delay
         self.teamColors = []
