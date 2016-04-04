@@ -1,5 +1,5 @@
-import os.path
-import yaml
+import importlib
+
 
 class Strategy:
     def __init__(self, name, description, version, BaseClass, AntClass):
@@ -15,12 +15,9 @@ class Loader:
         pass
 
     def loadStrategy(self, strategyName):
-        data = dict()
-        if not os.path.isfile('strategies/' + strategyName + '.py'):
-            raise ValueError('Incorrect strategy specified.')
-        with open('strategies/' + strategyName + '.py') as strategyFile:
-            exec(strategyFile.read(), data)
-        manifest = data['MANIFEST']
+        strategy_module = importlib.import_module('strategies.%s' % strategyName)
+        manifest = strategy_module.MANIFEST
+
         if not isinstance(manifest, dict) or 'BaseClass' not in manifest or 'AntClass' not in manifest:
             raise ValueError('Incorrect strategy specified.')
         if 'description' not in manifest:
