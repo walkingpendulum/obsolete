@@ -1,6 +1,12 @@
+# coding=utf-8
 import os
 from Tkinter import *
 from loader import Strategy, Loader
+import strategies
+
+
+def make_human_readable_names(path):
+    return os.path.split(path)[-1].split('.')[0]
 
 
 class ConfigDialog:
@@ -13,12 +19,16 @@ class ConfigDialog:
         Label(self.master, text='Choose strategies (just close this window when ready):').grid(
             row=0, columnspan=2)
         # Create list of strategies.
-        stratFiles = os.listdir('strategies')
-        self.index = [self.lo.loadStrategy(
-            filename[:-3]) for filename in stratFiles]
-        # And it human-readable names.
-        names = [o.name + ' ' + o.version for o in self.index]
+        stratFiles = filter(lambda t:
+                                not t.endswith('.pyc')
+                                and not t.startswith('__init__.py'),
+                            os.listdir(strategies.__path__[0]))
+        self.index = {
+            make_human_readable_names(filename): self.lo.loadStrategy(os.path.join(strategies.__path__[0], filename)) for filename in stratFiles
+        }
+        names = [make_human_readable_names(f) for f in stratFiles]
 
+        # todo: выпилить опцию "изменить описание"
         # Strategies combo box.
         self.selected = StringVar()
         self.selected.set(names[0])
@@ -27,7 +37,7 @@ class ConfigDialog:
 
         # Description field.
         self.desc = Text(self.master, width=1)
-        self.desc.insert('0.0', self.index[0].description)
+        self.desc.insert('0.0', sorted(self.index.values())[0].description)
         self.desc.grid(row=2, sticky=NSEW)
 
         # "Add" button for strategies.
@@ -38,7 +48,7 @@ class ConfigDialog:
         self.stratList = Listbox(self.master)
         for name in defaults['strategies']:
             self.stratList.insert(
-                END, name + ' ' + self.lo.loadStrategy(name).version)
+                END, name)
         self.stratList.grid(row=1, column=1, rowspan=2, sticky=NS)
 
         # "Delete" button for strategies.
@@ -85,18 +95,16 @@ class ConfigDialog:
         self.master.mainloop()
 
     def addStrategy(self):
-        self.stratList.insert(END, self.selected.get())
+        name = self.selected.get()
+        dir_path = os.path.split(strategies.__path__[0])[-1]
+        self.stratList.insert(END, os.path.join(dir_path, name + '.py'))
 
     def changeDescription(self, *nothing, **nowhere):
-        names = [o.name + ' ' + o.version for o in self.index]
         self.desc.delete('0.0', END)
-        self.desc.insert('0.0', self.index[
-                         names.index(self.selected.get())].description)
+        self.desc.insert('0.0', self.index[self.selected.get()].description)
 
     def ok(self):
-        names = [o.name + ' ' + o.version for o in self.index]
-        for name in list(self.stratList.get(0, END)):
-            self.result.append(self.index[names.index(name)])
+        self.result.extend([self.index[make_human_readable_names(name)] for name in list(self.stratList.get(0, END))])
         self.config['theme'] = (
             self.theme.get() if self.theme.get() else 'constructor')
         self.config['width'] = (int(self.width.get())
