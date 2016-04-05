@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/AntWars/AntWars.svg?branch=master)](https://travis-ci.org/AntWars/AntWars)
+
 # AntWars
 
 Пошаговая стратегия.  Муравьи передвигаются, кусаются, ищут еду и задаются вопросами устройства старших гомотопических групп сфер. 

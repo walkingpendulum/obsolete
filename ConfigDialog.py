@@ -1,9 +1,11 @@
 # coding=utf-8
 import os
 from Tkinter import *
-from loader import Strategy, Loader
+
 import strategies
 import themes
+from loader import Loader
+
 
 def make_human_readable_names(path):
     return os.path.split(path)[-1].split('.')[0]

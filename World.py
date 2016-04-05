@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from itertools import product
 from random import uniform, randint, sample, choice
 
