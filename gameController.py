@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from Tkinter import *
 from functools import partial
 from itertools import izip, product
@@ -14,7 +13,7 @@ from World import World
 
 
 class gameController:
-    def __init__(self, size, delay, log_name, themeStr, display=True):
+    def __init__(self, size, delay=None, log_name=None, themeStr=None, display=True):
         self.world = World(size, log_name)
         self.figure_by_obj = dict()
         self.winner_id = None
