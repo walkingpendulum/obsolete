@@ -10,3 +10,8 @@ install:
 script:
   - export PYTHONPATH="."
   - py.test
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
