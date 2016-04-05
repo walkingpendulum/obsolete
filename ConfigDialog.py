@@ -3,7 +3,7 @@ import os
 from Tkinter import *
 from loader import Strategy, Loader
 import strategies
-
+import themes
 
 def make_human_readable_names(path):
     return os.path.split(path)[-1].split('.')[0]
@@ -16,7 +16,7 @@ class ConfigDialog:
         self.lo = Loader()
         self.master = Tk()
 
-        Label(self.master, text='Choose strategies (just close this window when ready):').grid(
+        Label(self.master, text='Choose strategies):').grid(
             row=0, columnspan=2)
         # Create list of strategies.
         stratFiles = filter(lambda t:
@@ -60,8 +60,17 @@ class ConfigDialog:
             row=4, column=0, sticky=W)
         self.theme = StringVar()
         self.theme.set(defaults['theme'])
-        OptionMenu(self.master, self.theme, *[filename[:-3] for filename in os.listdir(
-            'themes')]).grid(row=4, column=1, sticky=EW)
+
+        def drop_extension(x):
+            return x.split('.')[0]
+        OptionMenu(
+            self.master,
+            self.theme,
+            *[drop_extension(filename) for filename in filter(
+                lambda t: t.endswith('.yml'),
+                os.listdir(themes.__path__[0])
+            )]
+        ).grid(row=4, column=1, sticky=EW)
 
         # Width spinbox.
         Label(self.master, text='Field width:').grid(row=5, column=0, sticky=W)

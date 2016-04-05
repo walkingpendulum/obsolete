@@ -7,6 +7,9 @@ from gameController import gameController
 from ConfigDialog import ConfigDialog
 from loader import Loader
 import states
+import themes
+import os
+
 
 if __name__ == '__main__':
     # TODO: Return console interface.
@@ -50,7 +53,8 @@ if __name__ == '__main__':
         size = (config['width'], config['height'])
         delay = config['delay']
         ready_log_name = (log_name if config['enable_logs'] else None)
-        themeStr = config['theme']
+        # turn name to path
+        themeStr = os.path.join(themes.__path__[0], config['theme'] + '.yml')
     else:
         size = tuple(map(int, args.size.split()))
         delay = args.delay
@@ -66,6 +70,7 @@ if __name__ == '__main__':
                            BaseClass=strategy.BaseClass,
                            team_id=i + 1,
                            team_name=strategy.name)})
+    # todo: либо довести до ума логи (нет в ConfigDialog), либо выпилить их
     AntWarsGame = gameController(size=size,
                                  delay=delay,
                                  log_name=ready_log_name,
