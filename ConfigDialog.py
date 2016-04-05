@@ -86,12 +86,9 @@ class ConfigDialog:
         self.delay.insert(0, defaults['delay'])
         self.delay.grid(row=7, column=1, sticky=EW)
 
-        # # Logs checkbox. (logs dont working anyway)
-        # self.enable_logs = IntVar()
-        # self.enable_logs.set(int(defaults['enable_logs']))
-        # Checkbutton(self.master, text='Enable logs', variable=self.enable_logs).grid(row=8, column=0, columnspan=2, sticky=W)
+        # destroy window and start game
+        Button(self.master, text='  Launch battle!  ', command=self.launch_game).grid(row=9, columnspan=3, rowspan=2, sticky=S)
 
-        self.master.protocol('WM_DELETE_WINDOW', self.ok)
         self.master.mainloop()
 
     def addStrategy(self):
@@ -103,7 +100,7 @@ class ConfigDialog:
         self.desc.delete('0.0', END)
         self.desc.insert('0.0', self.index[self.selected.get()].description)
 
-    def ok(self):
+    def launch_game(self):
         self.result.extend([self.index[make_human_readable_names(name)] for name in list(self.stratList.get(0, END))])
         self.config['theme'] = (
             self.theme.get() if self.theme.get() else 'constructor')
@@ -114,8 +111,6 @@ class ConfigDialog:
         self.config['delay'] = (int(self.delay.get())
                                 if self.delay.get().isdigit() else 500)
 
-        # # Logs dont working anyway.
-        # self.config['enable_logs'] = bool(self.enable_logs.get())
         self.config['enable_logs'] = False
 
         self.master.destroy()
