@@ -3,10 +3,11 @@
     ant.move() -> (destination_coord, move)
     moves: 'hit', 'move', 'take_food', 'drop_food'
 """
-from random import choice, randint
 from itertools import product
-from Base import Base
+from random import choice, randint
+
 from Ant import Ant
+from Base import Base
 from Food import Food
 
 

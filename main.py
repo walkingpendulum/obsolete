@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
-
 import argparse
-
-from World import Team
-from gameController import gameController
-from ConfigDialog import ConfigDialog
-from loader import Loader
-import states
-import themes
+import json
 import os
 
+import states
+import themes
+from ConfigDialog import ConfigDialog
+from World import Team
+from gameController import gameController
+from loader import Loader
 
 if __name__ == '__main__':
     # TODO: Return console interface.
@@ -28,6 +27,8 @@ if __name__ == '__main__':
                         default='constructor', help='Theme for graphical interface.')
     parser.add_argument('-a', '--algorithm', type=str, dest='strategies', action='append',
                         help='Specifes one strategy. Use few -a to specify few strategies')
+    parser.add_argument('--skip-visualization', dest='skip_visualization', action='store_true',
+                        help='Skip field visualization and get winner-id.')
 
     args = parser.parse_args()
 
@@ -65,6 +66,7 @@ if __name__ == '__main__':
             strategies = Loader().loadStrategies(args.strategies)
         else:
             strategies = []
+
     for i, strategy in enumerate(strategies):
         teams.update({Team(AntClass=strategy.AntClass,
                            BaseClass=strategy.BaseClass,
@@ -74,8 +76,11 @@ if __name__ == '__main__':
     AntWarsGame = gameController(size=size,
                                  delay=delay,
                                  log_name=ready_log_name,
-                                 themeStr=themeStr
+                                 themeStr=themeStr,
+                                 display=not args.skip_visualization,
                                  )
 
     AntWarsGame.Init(teams=teams)
-    AntWarsGame.launch()
+    result = AntWarsGame.launch()
+    if args.skip_visualization:
+        print json.dumps(result)
