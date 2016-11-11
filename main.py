@@ -1,3 +1,4 @@
+import sys
 import time
 
 
@@ -15,7 +16,7 @@ class iterate_with_ETA_output(object):
         for ind, value in enumerate(iterable):
             yield ind, value
 
-    def __init__(self, iterable, total=None):
+    def __init__(self, iterable, total=None, stream=None):
         if not total:
             if not hasattr(iterable, '__len__'):
                 raise NotImplementedError("Iterable has no __len__, specify 'total' argument")
@@ -23,8 +24,18 @@ class iterate_with_ETA_output(object):
         self.total = total
         self.start_time = time.time()
         self.iterator = self._gen(iterable)
+        self.stream = stream if stream else sys.stdout
+        self.need_to_close = bool(stream)
 
         time.sleep(1e-3)
+
+    def print_to_stream(self, msg):
+        self.stream.write(msg)
+        self.stream.flush()
+
+    def close_stream_if_needed(self):
+        if self.need_to_close:
+            self.stream.close()
 
     def __iter__(self):
         return self
@@ -45,8 +56,9 @@ class iterate_with_ETA_output(object):
             _output_str = '{:.2f}%, ETA {}, passed {}'.format(percentage, eta_str, passed_str)
             output_str = '\r' + '{:<90}'.format(_output_str)
 
-            print(output_str, end='')
+            self.print_to_stream(output_str)
             return value
-        except StopIteration:
-            print('')  # перевод строки
+        except (StopIteration, KeyboardInterrupt):
+            self.print_to_stream('\n')  # перевод строки
+            self.close_stream_if_needed()
             raise
