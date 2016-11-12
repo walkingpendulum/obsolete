@@ -30,7 +30,7 @@ class iterate_with_ETA_output(object):
         self.not_stdout = bool(stream)
 
     def print_to_stream(self, msg):
-        print(msg, end='', file=self.stream)
+        print(msg, end='', file=self.stream, flush=True)
 
     def close_stream_if_needed(self):
         if self.not_stdout:
