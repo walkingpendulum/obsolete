@@ -1,5 +1,19 @@
+# coding: utf-8
+from __future__ import print_function, division
 import sys
 import time
+
+
+# python2 compatibility
+if sys.version_info[:2] < (3, 3):
+    old_print = print
+
+    def print(*args, **kwargs):
+        flush = kwargs.pop('flush', False)
+        old_print(*args, **kwargs)
+        file = kwargs.get('file', sys.stdout)
+        if flush and file is not None:
+            file.flush()
 
 
 class iterate_with_ETA_output(object):
@@ -74,3 +88,7 @@ class iterate_with_ETA_output(object):
             self.print_to_stream('\n')  # перевод строки
             self.close_stream_if_needed()
             raise StopIteration
+
+    # python2 compatibility
+    next = __next__
+    iter = __iter__
